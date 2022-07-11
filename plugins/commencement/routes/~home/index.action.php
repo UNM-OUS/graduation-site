@@ -6,7 +6,7 @@ use DigraphCMS\URL\URL;
 Context::response()->setSearchIndex(true);
 
  ?>
-<h1>University Commencement Ceremonies</h1>
+<h1>University Commencement</h1>
 
 <p>
     Commencement is a tradition that marks the intersection of the past and the future.
@@ -18,4 +18,9 @@ Context::response()->setSearchIndex(true);
     The main UNM Commencement ceremony is held at the end of the Spring and Fall semesters, and is  very large event.
     UNM graduates from all levels of every school and college are invited to attend.
     Many schools, colleges, departments, and programs also hold their own <a href="<?php echo new URL('/convocations/'); ?>">departmental convocations</a>.
+</p>
+
+<p>
+    Students are encouraged to celebrate their achievements to the fullest, and attend both Commencement and their departmental convocation if available.
+    Check with your student organizations too, some clubs and smaller organizations may also have their own ceremonies, even if they aren't listed here.
 </p>
