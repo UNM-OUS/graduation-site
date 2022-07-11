@@ -1,0 +1,31 @@
+{
+    "name": "unmous/graduation-site",
+    "type": "project",
+    "authors": [],
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "digraphcms/digraph-core": "^2",
+        "unmous/ous_digraph_module": "^2"
+    },
+    "repositories": [{
+        "type": "vcs",
+        "url": "https://github.com/UNM-OUS/ous_digraph_module.git"
+    }],
+    "config": {
+        "platform": {
+            "php": "7.4.15"
+        }
+    },
+    "scripts": {
+        "migrate": [
+            "phinx migrate"
+        ],
+        "seed": [
+            "phinx seed:run"
+        ],
+        "server": [
+            "php -S localhost:8000 -t web web/index-dev.php"
+        ]
+    }
+}

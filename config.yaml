@@ -1,0 +1,32 @@
+fields:
+  site:
+    name: Graduation Events
+
+# Should be disabled in favor of actual cron jobs for non-sandbox sites
+cron:
+  route_enabled: false
+  poor_mans_cron: false
+
+# Should only be disabled for sites that require general signins, like for signups
+unm:
+  block_unknown_netids: null
+usermenu:
+  guest_signin: false
+
+# Generally should be fine for most sites
+theme:
+  bundle_css: true
+  bundle_js: true
+  head_cache_ttl: -1
+errors:
+  display_trace: false
+cache:
+  ttl: 60
+  template_ttl: -1
+  content_ttl: 60
+files:
+  ttl: -1
+  css:
+    minify: true
+    sourcemap: false
+    keepimportantcomments: true
