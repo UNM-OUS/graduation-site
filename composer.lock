@@ -346,12 +346,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/digraph-cms/digraph-core.git",
-                "reference": "4376d3ae2432d902fdc4ed9b0439c65da9491d89"
+                "reference": "d5480f2dd779cc162113d28f35a553037990682d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digraph-cms/digraph-core/zipball/4376d3ae2432d902fdc4ed9b0439c65da9491d89",
-                "reference": "4376d3ae2432d902fdc4ed9b0439c65da9491d89",
+                "url": "https://api.github.com/repos/digraph-cms/digraph-core/zipball/d5480f2dd779cc162113d28f35a553037990682d",
+                "reference": "d5480f2dd779cc162113d28f35a553037990682d",
                 "shasum": ""
             },
             "require": {
@@ -423,7 +423,7 @@
                 "issues": "https://github.com/digraph-cms/digraph-core/issues",
                 "source": "https://github.com/digraph-cms/digraph-core/tree/v2"
             },
-            "time": "2022-07-11T15:21:09+00:00"
+            "time": "2022-07-12T19:13:28+00:00"
         },
         {
             "name": "donatj/phpuseragentparser",
@@ -4150,12 +4150,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/UNM-OUS/ous_digraph_module.git",
-                "reference": "333fbb774f21f285af123f92126f114e0ae897df"
+                "reference": "42a4f13856c680b9776be7d8753b3b6f884dd72b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UNM-OUS/ous_digraph_module/zipball/333fbb774f21f285af123f92126f114e0ae897df",
-                "reference": "333fbb774f21f285af123f92126f114e0ae897df",
+                "url": "https://api.github.com/repos/UNM-OUS/ous_digraph_module/zipball/42a4f13856c680b9776be7d8753b3b6f884dd72b",
+                "reference": "42a4f13856c680b9776be7d8753b3b6f884dd72b",
                 "shasum": ""
             },
             "require": {
@@ -4174,7 +4174,7 @@
                 "source": "https://github.com/UNM-OUS/ous_digraph_module/tree/v2",
                 "issues": "https://github.com/UNM-OUS/ous_digraph_module/issues"
             },
-            "time": "2022-06-28T19:24:33+00:00"
+            "time": "2022-07-12T19:07:54+00:00"
         }
     ],
     "packages-dev": [],
@@ -4188,5 +4188,5 @@
     "platform-overrides": {
         "php": "7.4.15"
     },
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }

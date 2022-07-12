@@ -2,8 +2,10 @@
 
 use DigraphCMS\Context;
 use DigraphCMS\URL\URL;
+use DigraphCMS_Plugins\unmous\ous_digraph_module\Semesters;
 
-Context::response()->setSearchIndex(true);
+Context::response()->setSearchIndex(!Context::url()->query());
+Context::response()->enableCache();
 
 ?>
 <h1>University Commencement</h1>
@@ -19,3 +21,18 @@ Context::response()->setSearchIndex(true);
     UNM graduates from all levels of every school and college are invited to attend.
     Many schools, colleges, departments, and programs also hold their own <a href="<?php echo new URL('/convocations/'); ?>">departmental convocations</a>.
 </p>
+
+<?php
+
+$semester = Semesters::current();
+echo "<h2>$semester</h2>";
+
+// if ($semester->semester() == 'Summer') {
+//     Notifications::printNotice(
+//         sprintf(
+//             'Commencements are only held at the end of the Spring and Fall semesters, please check back here after %s for more information about the %s Commencement.',
+//             Format::date($semester->nextFull()->start(), true),
+//             $semester->nextFull()
+//         )
+//     );
+// }
