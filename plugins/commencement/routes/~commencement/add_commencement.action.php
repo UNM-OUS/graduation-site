@@ -1,10 +1,13 @@
 <h1>Add Commencement</h1>
 <?php
 
+use DigraphCMS\Config;
 use DigraphCMS\Content\Pages;
 use DigraphCMS\Context;
+use DigraphCMS\DB\DB;
 use DigraphCMS\Digraph;
 use DigraphCMS\HTML\Forms\Field;
+use DigraphCMS\HTML\Forms\Fields\CheckboxField;
 use DigraphCMS\HTML\Forms\Fields\DatetimeField;
 use DigraphCMS\HTML\Forms\FormWrapper;
 use DigraphCMS\HTML\Forms\SELECT;
@@ -12,6 +15,7 @@ use DigraphCMS\HTTP\RedirectException;
 use DigraphCMS\RichContent\RichContentField;
 use DigraphCMS\UI\Format;
 use DigraphCMS_Plugins\unmous\commencement\CommencementEvent;
+use DigraphCMS_Plugins\unmous\commencement\SignupWindows\SignupWindow;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\Forms\SemesterField;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\Semester;
 
@@ -98,8 +102,15 @@ $body = (new RichContentField('Body content', Context::arg('uuid')))
     ->setRequired(false);
 $form->addChild($body);
 
+// default windows
+$defaultWindows = (new CheckboxField('Add default signup windows'))
+    ->setDefault(true);
+$form->addChild($defaultWindows);
+
 // handle form
 if ($form->ready()) {
+    DB::beginTransaction();
+    // insert event
     $event = CommencementEvent::create(
         $semester->value(),
         $date->value(),
@@ -110,6 +121,21 @@ if ($form->ready()) {
     $event->setUUID(Context::arg('uuid'));
     $event->richContent('body', $body->value());
     $event->insert();
+    // insert default signup windows
+    if ($defaultWindows->value()) {
+        foreach (Config::get('commencement.default_signups') as $s) {
+            $window = SignupWindow::create(
+                null,
+                $s['type'],
+                $event->time()->modify($s['start'])->setTime(9, 0, 0, 0),
+                $event->time()->modify($s['end'])->setTime(17, 0, 0, 0)
+            );
+            if (@$s['unlisted']) $window->setUnlisted(true);
+            $window->insert($event->uuid());
+        }
+    }
+    // redirect to event URL
+    DB::commit();
     throw new RedirectException($event->url());
 }
 

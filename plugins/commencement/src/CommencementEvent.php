@@ -5,6 +5,8 @@ namespace DigraphCMS_Plugins\unmous\commencement;
 use DateTime;
 use DigraphCMS\Content\Page;
 use DigraphCMS\URL\URL;
+use DigraphCMS_Plugins\unmous\commencement\SignupWindows\SignupWindows;
+use DigraphCMS_Plugins\unmous\commencement\SignupWindows\SignupWindowSelect;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\Semester;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\Semesters;
 
@@ -20,6 +22,11 @@ class CommencementEvent extends Page
             'location' => $location,
             'type' => $type
         ]);
+    }
+
+    public function signupWindows(): SignupWindowSelect
+    {
+        return SignupWindows::for($this->uuid());
     }
 
     public function parent(?URL $url = null): ?URL

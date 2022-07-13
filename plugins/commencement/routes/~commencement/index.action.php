@@ -20,12 +20,27 @@ foreach ($semesters as $semester) {
     $events = Commencement::semester($semester);
     foreach ($events as $event) {
         printf(
-            "<p><strong><a href='%s'>%s</a></strong> - %s - <a href='%s'>edit</a></p>",
+            "<h3><strong><a href='%s'>%s</a></strong></h3><p>%s | <a href='%s'>edit</a> | <a href='%s'>add signup window</a></p>",
             $event->url(),
             $event->name(),
             Format::datetime($event->time()),
-            $event->url('edit')
+            $event->url('edit'),
+            $event->url('_add_commencement_signup')
         );
+        $windows = $event->signupWindows();
+        echo "<ul>";
+        while ($window = $windows->fetch()) {
+            printf(
+                '<li><small><a href="%s">%s</a> - %s to %s | <a href="%s">edit</a> | <a href="%s">reports</a></small></li>',
+                $window->url(),
+                $window->name(),
+                Format::date($window->start()),
+                Format::date($window->end()),
+                $window->url('edit'),
+                $window->url('reports')
+            );
+        }
+        echo "</ul>";
     }
     printf(
         '<p><small><a href="%s">add event</a></small></p>',
