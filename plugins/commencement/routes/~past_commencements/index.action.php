@@ -2,15 +2,15 @@
 <?php
 
 use DigraphCMS\Context;
-use DigraphCMS\UI\DataTables\QueryTable;
 use DigraphCMS\UI\Format;
+use DigraphCMS\UI\Pagination\PaginatedTable;
 use DigraphCMS_Plugins\unmous\commencement\Commencement;
 use DigraphCMS_Plugins\unmous\commencement\CommencementEvent;
 
 Context::response()->enableCache();
 
 $query = Commencement::past();
-$table = new QueryTable(
+$table = new PaginatedTable(
     $query,
     function (CommencementEvent $event) {
         return [
@@ -18,7 +18,6 @@ $table = new QueryTable(
             Format::datetime($event->time()),
             $event->location()
         ];
-    },
-    []
+    }
 );
 echo $table;

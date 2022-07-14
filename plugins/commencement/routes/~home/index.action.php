@@ -27,7 +27,8 @@ Context::response()->enableCache();
 
 <?php
 
-$semester = Semesters::current();
+// TODO: switch this to current() when everything is ready
+$semester = Semesters::currentFull();
 $events = Commencement::semester($semester);
 if ($semester->semester() == 'Summer' && !$events->count()) {
     Notifications::printNotice(
