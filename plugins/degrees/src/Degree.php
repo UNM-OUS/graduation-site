@@ -183,11 +183,6 @@ class Degree
         return $this->override;
     }
 
-    public function privacy(): bool
-    {
-        return $this->privacy;
-    }
-
     public function userID(): string
     {
         return $this->userid;
