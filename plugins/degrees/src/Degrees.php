@@ -14,13 +14,4 @@ class Degrees
                 ->order('degree.semester DESC, degree.lastname ASC, degree.firstname ASC')
         );
     }
-
-    public static function selectAny(): DegreeSelect
-    {
-        return new DegreeSelect(
-            DB::query()->from('degree')
-                // sort first by semester, then by name
-                ->order('degree.semester DESC, degree.lastname ASC, degree.firstname ASC')
-        );
-    }
 }
