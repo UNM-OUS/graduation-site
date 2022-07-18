@@ -9,14 +9,11 @@ final class DegreeTable extends AbstractMigration
     public function change(): void
     {
         $this->table('degree')
-            ->addColumn('uuid', 'uuid')
-            ->addIndex('uuid', ['unique' => true])
-
             ->addColumn('override', 'boolean')
             ->addIndex('override')
 
-            ->addColumn('privacy', 'boolean')
-            ->addIndex('privacy')
+            ->addColumn('userid', 'string', ['length' => 32])
+            ->addIndex('userid')
 
             ->addColumn('netid', 'string', ['length' => 20, 'null' => true])
             ->addIndex('netid')

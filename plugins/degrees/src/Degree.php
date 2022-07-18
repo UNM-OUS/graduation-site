@@ -2,15 +2,15 @@
 
 namespace DigraphCMS_Plugins\unmous\degrees;
 
+use DigraphCMS\Config;
 use DigraphCMS\DB\DB;
-use DigraphCMS\Digraph;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\Semester;
 
 class Degree
 {
-    protected $uuid;
-    protected $privacy, $override;
-    protected $netid, $firstname, $lastname;
+    protected $existing = false;
+    protected $override;
+    protected $userid, $netid, $firstname, $lastname;
     protected $status, $semester, $level, $college, $department, $program;
     protected $major1, $major2, $minor1, $minor2, $honors;
     protected $job;
@@ -18,9 +18,27 @@ class Degree
 
     public static function fromImportRow(array $row, string $job = null, bool $override = false): Degree
     {
+        // check if there's a privacy flag, skip if there's no privacy waiver
+        if ($row['confidentiality indicator'] == 'Y') {
+            if (!DB::query()->from('privacy_waiver')->where('netid = ?', [$row['netid']])->count()) {
+                throw new \Exception('Privacy flag, no waiver');
+            }
+        }
+        // userid
+        $userID = md5($row['id'] . Config::get('secret'));
         // first name is either preferred or regular
         $firstName = trim($row['student preferred first name']);
         if (!$firstName) $firstName = $row['student first name'];
+        // last name
+        $lastName = trim($row['student last name']);
+        // look in our system for a preferred NetID
+        if ($row['netid']) {
+            $preferred = DB::query()->from('degree_preferred_name')->where('netid = ?', [$row['netid']])->fetch();
+            if ($preferred) {
+                $firstName = $preferred['first_name'] ?? $firstName;
+                $lastName = $preferred['last_name'] ?? $lastName;
+            }
+        }
         // status comes from graduation status
         switch ($row['graduation status']) {
             case 'Pending':
@@ -71,10 +89,10 @@ class Degree
         if (!$honors) $honors = $row['commencement honors flag'];
         // return new object
         return new Degree(
-            $row['confidentiality indicator'] == 'Y',
+            $userID,
             $row['netid'],
             $firstName,
-            $row['student last name'],
+            $lastName,
             $row['graduation status'],
             Semester::fromCode($row['academic period code']),
             $row['award category'],
@@ -85,40 +103,43 @@ class Degree
             $row['second major'],
             $row['first minor'],
             $row['second minor'],
-            $honors,
+            $honors ? ucwords(strtolower($honors)) : null,
             $job,
             static::fixDissertationTitle($row['dissertation title']),
             $override
         );
     }
 
-    public function uuid(): string
-    {
-        return $this->uuid
-            ?? $this->uuid = Digraph::uuid(null, serialize([
-                $this->firstname,
-                $this->lastname,
-                $this->semester,
-                $this->level,
-                $this->college,
-                $this->department,
-                $this->program,
-                $this->major1
-            ]));
-    }
-
     public function save()
     {
-        if (DB::query()->from('degree')->where('uuid = ?', [$this->uuid()])->count()) $this->update();
+        if ($this->existing() !== null) $this->update();
         else $this->insert();
+    }
+
+    protected function existing(): ?int
+    {
+        if ($this->existing === false) {
+            $existing = DB::query()->from('degree')
+                ->where('userid = ?', [$this->userid])
+                ->where('semester = ?', [$this->semester])
+                ->where('level = ?', [$this->level])
+                ->where('college = ?', [$this->college])
+                ->where('department = ?', [$this->department])
+                ->where('program = ?', [$this->program])
+                ->where('major1 = ?', [$this->major1])
+                ->fetch();
+            $this->existing = $existing
+                ? $existing['id']
+                : null;
+        }
+        return $this->existing;
     }
 
     protected function insert()
     {
         DB::query()->insertInto('degree', [
-            'uuid' => $this->uuid(),
             'override' => $this->override(),
-            'privacy' => $this->privacy(),
+            'userid' => $this->userID(),
             'netid' => $this->netID(),
             'firstname' => $this->firstName(),
             'lastname' => $this->lastName(),
@@ -141,8 +162,8 @@ class Degree
     protected function update()
     {
         $row = [
-            'override' => $this->override(),
-            'privacy' => $this->privacy(),
+            'firstname' => $this->firstName(),
+            'lastname' => $this->lastName(),
             'gradstatus' => $this->status(),
             'honors' => $this->honors(),
             'major2' => $this->major2(),
@@ -153,7 +174,7 @@ class Degree
         ];
         if ($this->netID()) $row['netid'] = $this->netID();
         DB::query()->update('degree', $row)
-            ->where('uuid = ?', [$this->uuid()])
+            ->where('id = ?', [$this->existing()])
             ->execute();
     }
 
@@ -165,6 +186,11 @@ class Degree
     public function privacy(): bool
     {
         return $this->privacy;
+    }
+
+    public function userID(): string
+    {
+        return $this->userid;
     }
 
     public function netID(): ?string
@@ -264,6 +290,8 @@ class Degree
     public static function fixDissertationTitle(?string $title): ?string
     {
         $title = trim($title);
+        // fix all upper case or all lower case
+        if (strtoupper($title) == $title || strtolower($title) == $title) $title = ucwords(strtolower($title));
         if (!$title) return null;
         return $title;
     }
@@ -271,7 +299,7 @@ class Degree
     public static function fromDatabaseRow(array $row): Degree
     {
         return new Degree(
-            !!$row['privacy'],
+            $row['userid'],
             $row['netid'],
             $row['firstname'],
             $row['lastname'],
@@ -293,7 +321,7 @@ class Degree
     }
 
     public function __construct(
-        bool $privacy,
+        string $userid,
         ?string $netid,
         string $firstname,
         string $lastname,
@@ -312,7 +340,7 @@ class Degree
         string $dissertation = null,
         bool $override = false
     ) {
-        $this->privacy = $privacy;
+        $this->userid = $userid;
         $this->netid = trim($netid) ? strtolower(trim($netid)) : null;
         $this->firstname = trim($firstname);
         $this->lastname = trim($lastname);
@@ -330,47 +358,5 @@ class Degree
         $this->job = trim($job) ? trim($job) : null;
         $this->dissertation = trim($dissertation) ? trim($dissertation) : null;
         $this->override = $override;
-    }
-
-    public function copy(
-        bool $privacy = null,
-        ?string $netid = null,
-        string $firstname = null,
-        string $lastname = null,
-        string $status = null,
-        Semester $semester = null,
-        string $level = null,
-        string $college = null,
-        ?string $department = null,
-        string $program = null,
-        string $major1 = null,
-        string $major2 = null,
-        string $minor1 = null,
-        string $minor2 = null,
-        string $honors = null,
-        string $job = null,
-        string $dissertation = null,
-        bool $override = false
-    ): Degree {
-        return new Degree(
-            $privacy ?? $this->privacy(),
-            $netid ?? $this->netID(),
-            $firstname ?? $this->firstName(),
-            $lastname ?? $this->lastName(),
-            $status ?? $this->status(),
-            $semester ?? $this->semester(),
-            $level ?? $this->level(),
-            $college ?? $this->college(),
-            $department ?? $this->department(),
-            $program ?? $this->program(),
-            $major1 ?? $this->major1(),
-            $major2 ?? $this->major2(),
-            $minor1 ?? $this->minor1(),
-            $minor2 ?? $this->minor2(),
-            $honors ?? $this->honors(),
-            $job ?? $this->job(),
-            $dissertation ?? $this->dissertation(),
-            $override ?? $this->override()
-        );
     }
 }
