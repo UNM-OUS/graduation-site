@@ -3,6 +3,11 @@ page_types:
   commencement_signup: \DigraphCMS_Plugins\unmous\commencement\SignupWindows\SignupWindow
 
 commencement:
+  faculty_roles:
+    faculty: Faculty honor processional
+    platform: Platform member (including platform marshals)
+    marshal: Marshal
+    hooder: I expect to hood a student
   signup_types:
     undergrad: Undergraduate student RSVP
     masters: Masters student RSVP

@@ -15,8 +15,9 @@ class RegaliaAlmaMaterField extends FIELDSET
         parent::__construct($label);
         $this->institution = new Field('Institution', new InstitutionInput());
         $this->addChild($this->institution);
-        $this->notFound = new CheckboxField('I cannot locate my alma mater institution');
-        $this->notFound->addTip('Not all institutions are available in the Jostens hood book. If you cannot find your alma mater in the above search box, check here and will attempt to add your alma mater to our database using the most appropriate regalia available from Jostens. Someone may contact you directly for more information if necessary.');
+        $this->notFound = new CheckboxField('I cannot locate the school where I got my degree');
+        $this->notFound->addTip('Not all institutions are listed in the Jostens system from which our rental regalia is ordered.');
+        $this->notFound->addTip('If you cannot find your alma mater in the above search box, check here and we will attempt to add it to our database using the most appropriate regalia available from Jostens. Someone may contact you directly for more information if necessary.');
         $this->addChild($this->notFound);
         $this->addClass('regalia-almamater-field');
         $this->institution->addClass('regalia-almamater-field__institution');

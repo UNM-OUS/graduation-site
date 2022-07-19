@@ -9,12 +9,12 @@ document.addEventListener('DigraphDOMReady', (e) => {
         }
     }
     function update(field) {
-        const optOut = field.getElementsByClassName('regalia-request-field__opt-out')[0].getElementsByTagName('input')[0];
+        const optOut = field.getElementsByClassName('regalia-request-field__needs-regalia')[0].getElementsByTagName('input')[0];
         const infoForm = field.getElementsByClassName('regalia-request-field__info-form')[0];
         if (optOut.checked) {
-            infoForm.style.display = 'none';
-        } else {
             infoForm.style.display = null;
+        } else {
+            infoForm.style.display = 'none';
         }
     }
 });
