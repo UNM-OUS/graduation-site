@@ -8,9 +8,15 @@ use DigraphCMS\URL\URL;
 use DigraphCMS\Users\Permissions;
 use Envms\FluentPDO\Queries\Select;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\SharedDB;
+use Envms\FluentPDO\Query;
 
 class Regalia extends AbstractPlugin
 {
+    public static function query(): Query
+    {
+        return SharedDB::query();
+    }
+
     public static function getPersonInfo(string $for)
     {
         return static::people()

@@ -65,8 +65,8 @@ $table = new PaginatedTable(
             $row['label']
                 . ($row['deprecated'] ? ' <strong>[HIDDEN]</strong>' : '')
                 . ($row['institution_deprecated'] ? ' <strong>[DEPRECATED]</strong>' : ''),
-            $row['institution_color_lining1'],
-            $row['institution_color_chevron1'],
+            $row['color_lining'],
+            $row['color_chevron'],
 
         ];
     },
