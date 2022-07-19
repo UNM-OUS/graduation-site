@@ -1,6 +1,6 @@
 <?php
 
-namespace DigraphCMS_Plugins\unmous\ous_regalia\Forms;
+namespace DigraphCMS_Plugins\unmous\regalia\Forms;
 
 use DigraphCMS\Context;
 use DigraphCMS\HTML\DIV;
@@ -9,7 +9,7 @@ use DigraphCMS\HTML\Forms\FormWrapper;
 use DigraphCMS\HTML\Tag;
 use DigraphCMS\HTTP\RedirectException;
 use DigraphCMS\URL\URL;
-use DigraphCMS_Plugins\unmous\ous_regalia\Regalia;
+use DigraphCMS_Plugins\unmous\regalia\Regalia;
 
 class RegaliaInformationForm extends DIV
 {

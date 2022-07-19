@@ -1,10 +1,10 @@
 <?php
 
-namespace DigraphCMS_Plugins\unmous\ous_regalia\Forms;
+namespace DigraphCMS_Plugins\unmous\regalia\Forms;
 
 use DigraphCMS\HTML\Forms\Fields\CheckboxField;
 use DigraphCMS\HTML\Forms\FIELDSET;
-use DigraphCMS_Plugins\unmous\ous_regalia\Regalia;
+use DigraphCMS_Plugins\unmous\regalia\Regalia;
 
 class RegaliaRequestField extends FIELDSET
 {

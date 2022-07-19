@@ -3,7 +3,7 @@
 use DigraphCMS\Context;
 use DigraphCMS\HTTP\HttpError;
 use DigraphCMS\Session\Cookies;
-use DigraphCMS_Plugins\unmous\ous_regalia\Regalia;
+use DigraphCMS_Plugins\unmous\regalia\Regalia;
 
 if (Context::arg('csrf') !== Cookies::csrfToken('autocomplete')) {
     throw new HttpError(400);

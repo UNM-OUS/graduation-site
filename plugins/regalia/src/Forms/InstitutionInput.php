@@ -1,10 +1,10 @@
 <?php
 
-namespace DigraphCMS_Plugins\unmous\ous_regalia\Forms;
+namespace DigraphCMS_Plugins\unmous\regalia\Forms;
 
 use DigraphCMS\HTML\Forms\Fields\Autocomplete\AutocompleteInput;
 use DigraphCMS\URL\URL;
-use DigraphCMS_Plugins\unmous\ous_regalia\Regalia;
+use DigraphCMS_Plugins\unmous\regalia\Regalia;
 
 class InstitutionInput extends AutocompleteInput
 {

@@ -7,7 +7,7 @@ use DigraphCMS\UI\Pagination\ColumnSortingHeader;
 use DigraphCMS\UI\Pagination\PaginatedTable;
 use DigraphCMS\UI\Toolbars\ToolbarLink;
 use DigraphCMS\URL\URL;
-use DigraphCMS_Plugins\unmous\ous_regalia\Regalia;
+use DigraphCMS_Plugins\unmous\regalia\Regalia;
 
 $query = Regalia::allInstitutions();
 $query->order('regalia_institution.id DESC');

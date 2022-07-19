@@ -7,8 +7,8 @@ use DigraphCMS\HTML\Forms\FormWrapper;
 use DigraphCMS\HTML\Forms\SELECT;
 use DigraphCMS\HTTP\RedirectException;
 use DigraphCMS\URL\URL;
-use DigraphCMS_Plugins\unmous\ous_regalia\Forms\DegreeFieldInput;
-use DigraphCMS_Plugins\unmous\ous_regalia\Regalia;
+use DigraphCMS_Plugins\unmous\regalia\Forms\DegreeFieldInput;
+use DigraphCMS_Plugins\unmous\regalia\Regalia;
 
 $form = new FormWrapper();
 

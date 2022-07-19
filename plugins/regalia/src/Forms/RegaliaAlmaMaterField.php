@@ -1,6 +1,6 @@
 <?php
 
-namespace DigraphCMS_Plugins\unmous\ous_regalia\Forms;
+namespace DigraphCMS_Plugins\unmous\regalia\Forms;
 
 use DigraphCMS\HTML\Forms\Field;
 use DigraphCMS\HTML\Forms\Fields\CheckboxField;

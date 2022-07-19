@@ -1,6 +1,6 @@
 <?php
 
-namespace DigraphCMS_Plugins\unmous\ous_regalia;
+namespace DigraphCMS_Plugins\unmous\regalia;
 
 use DigraphCMS\Plugins\AbstractPlugin;
 use DigraphCMS\UI\UserMenu;
