@@ -14,12 +14,15 @@ commencement:
     - type: undergrad
       start: -54 days
       end: -8 days
+      not_type: [graduate]
     - type: masters
       start: -54 days
       end: -8 days
+      not_type: [undergraduate]
     - type: terminal
       start: -54 days
       end: -15 days
+      not_type: [undergraduate]
     - type: faculty
       start: -95 days
       end: -15 days

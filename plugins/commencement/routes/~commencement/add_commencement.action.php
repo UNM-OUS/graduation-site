@@ -124,6 +124,9 @@ if ($form->ready()) {
     // insert default signup windows
     if ($defaultWindows->value()) {
         foreach (Config::get('commencement.default_signups') as $s) {
+            // check that this event's type isn't in the default signup's not_type config
+            if (in_array($event->type(), @$s['not_type'] ?? [])) continue;
+            // create signup window
             $window = SignupWindow::create(
                 null,
                 $s['type'],
