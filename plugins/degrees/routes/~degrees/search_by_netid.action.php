@@ -6,9 +6,10 @@ use DigraphCMS\DB\DB;
 use DigraphCMS\HTML\Forms\FormWrapper;
 use DigraphCMS\HTTP\RedirectException;
 use DigraphCMS\UI\CallbackLink;
-use DigraphCMS\UI\Pagination\ColumnSortingHeader;
+use DigraphCMS\UI\Format;
 use DigraphCMS\UI\Pagination\PaginatedTable;
 use DigraphCMS\URL\URL;
+use DigraphCMS\Users\Users;
 use DigraphCMS_Plugins\unmous\degrees\Degrees;
 use DigraphCMS_Plugins\unmous\degrees\DegreeTable;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\Forms\NetIDInput;
@@ -31,7 +32,7 @@ if (!($netid = Context::arg('netid'))) return;
 
 // degree records
 echo "<h2>Degree records</h2>";
-echo new DegreeTable(Degrees::selectAny()
+echo new DegreeTable(Degrees::select()
     ->where('netid = ?', [$netid]));
 
 // preferred names
@@ -43,7 +44,6 @@ $table = new PaginatedTable(
     $names,
     function (array $row): array {
         return [
-            $row['netid'],
             $row['first_name'],
             $row['last_name'],
             (new CallbackLink(function () use ($row) {
@@ -56,9 +56,35 @@ $table = new PaginatedTable(
         ];
     },
     [
-        new ColumnSortingHeader('NetID', 'netid', $names),
-        new ColumnSortingHeader('First name', 'first_name', $names),
-        new ColumnSortingHeader('Last name', 'last_name', $names),
+        'First name',
+        'Last name',
+        '',
+    ]
+);
+echo $table;
+
+echo "<h2>Privacy waivers</h2>";
+$waivers = DB::query()->from('privacy_waiver')
+    ->where('netid = ?', [Context::arg('netid')])
+    ->order('id desc');
+$table = new PaginatedTable(
+    $waivers,
+    function (array $row): array {
+        return [
+            $row['name'],
+            Format::date($row['created']) . ' by ' . Users::user($row['created_by']),
+            (new CallbackLink(function () use ($row) {
+                DB::query()
+                    ->delete('privacy_waiver', $row['id'])
+                    ->execute();
+            }))
+                ->setData('target', '_frame')
+                ->addChild('delete')
+        ];
+    },
+    [
+        'Name',
+        'Created',
         '',
     ]
 );

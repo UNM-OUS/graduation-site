@@ -1,4 +1,9 @@
 <h1>Privacy waivers</h1>
+<p>
+    Privacy waivers will make a student <em>both</em> able sign up and have their name/degree published online.
+    If a student wants to sign up, but does not wish to have their name published, enter an override degree for them instead.
+    That way they will be able to sign up and walk, but their name will not appear in the program.
+</p>
 <?php
 
 use DigraphCMS\DB\DB;
@@ -20,8 +25,9 @@ $form = new FormWrapper();
 $netid = (new Field('NetID', new NetIDInput))
     ->setRequired(true)
     ->addForm($form);
-$name = (new Field('name'))
+$name = (new Field('Name'))
     ->setRequired(true)
+    ->addTip("Note that this name won't be used as an override or anything. It's only used to display the record in the table below.")
     ->addForm($form);
 if ($form->ready()) {
     // check if it already exists

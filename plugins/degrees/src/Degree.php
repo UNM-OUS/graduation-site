@@ -31,14 +31,6 @@ class Degree
         if (!$firstName) $firstName = $row['student first name'];
         // last name
         $lastName = trim($row['student last name']);
-        // look in our system for a preferred NetID
-        if ($row['netid']) {
-            $preferred = DB::query()->from('degree_preferred_name')->where('netid = ?', [$row['netid']])->fetch();
-            if ($preferred) {
-                $firstName = $preferred['first_name'] ?? $firstName;
-                $lastName = $preferred['last_name'] ?? $lastName;
-            }
-        }
         // status comes from graduation status
         switch ($row['graduation status']) {
             case 'Pending':
@@ -110,8 +102,24 @@ class Degree
         );
     }
 
+    public function delete()
+    {
+        if ($id = $this->existing()) {
+            DB::query()->delete('degree', $id)->execute();
+        }
+    }
+
     public function save()
     {
+        // look in our system for preferred names
+        if ($this->netID()) {
+            $preferred = DB::query()->from('degree_preferred_name')->where('netid = ?', [$this->netID()])->fetch();
+            if ($preferred) {
+                $this->firstname = $preferred['first_name'] ?? $this->firstname;
+                $this->lastname = $preferred['last_name'] ?? $this->lastname;
+            }
+        }
+        // do actual saving
         if ($this->existing() !== null) $this->update();
         else $this->insert();
     }
@@ -120,6 +128,7 @@ class Degree
     {
         if ($this->existing === false) {
             $existing = DB::query()->from('degree')
+                ->where('override = ?', [$this->override])
                 ->where('userid = ?', [$this->userid])
                 ->where('semester = ?', [$this->semester])
                 ->where('level = ?', [$this->level])
@@ -170,7 +179,7 @@ class Degree
             'minor1' => $this->minor1(),
             'minor2' => $this->minor2(),
             'dissertation' => $this->dissertation(),
-            'job' => $this->job()
+            'job' => $this->job(),
         ];
         if ($this->netID()) $row['netid'] = $this->netID();
         DB::query()->update('degree', $row)

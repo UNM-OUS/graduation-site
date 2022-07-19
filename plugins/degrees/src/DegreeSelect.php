@@ -10,6 +10,17 @@ use DigraphCMS\DB\AbstractMappedSelect;
  */
 class DegreeSelect extends AbstractMappedSelect
 {
+    /**
+     * Add a clause to omit override degrees from this query, such as for the program.
+     *
+     * @return $this
+     */
+    function noOverrides()
+    {
+        $this->where('override <> 1');
+        return $this;
+    }
+
     function doRowToObject(array $row)
     {
         return Degree::fromDatabaseRow($row);

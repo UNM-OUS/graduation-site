@@ -25,6 +25,7 @@ class DegreeTable extends PaginatedTable
                     $degree->level(),
                     $degree->college(),
                     [
+                        'override' => $degree->override() ? 'YES' : null,
                         'department' => $degree->department(),
                         'program' => $degree->program(),
                         'major' => implode(', ', array_filter([
