@@ -5,10 +5,20 @@ namespace DigraphCMS_Plugins\unmous\commencement\SignupWindows;
 use DateTime;
 use DigraphCMS\Config;
 use DigraphCMS\Content\AbstractPage;
+use DigraphCMS\Content\Graph;
+use DigraphCMS_Plugins\unmous\commencement\CommencementEvent;
 
 class SignupWindow extends AbstractPage
 {
     const DEFAULT_SLUG = '[uuid]';
+
+    public function commencement(): CommencementEvent
+    {
+        return Graph::parents($this->uuid(), 'normal')
+            ->where('class = "commencement"')
+            ->limit(1)
+            ->fetch();
+    }
 
     public static function create(?string $name, string $type, DateTime $start, DateTime $end): SignupWindow
     {

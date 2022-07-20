@@ -6,6 +6,13 @@ use DigraphCMS\DB\DB;
 
 class Degrees
 {
+    public static function get(?int $id): ?Degree
+    {
+        if ($id === null) return null;
+        else return static::select()
+            ->where('id = ?', [$id])
+            ->fetch();
+    }
     public static function select(): DegreeSelect
     {
         return new DegreeSelect(

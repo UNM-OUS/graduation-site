@@ -44,7 +44,7 @@ if (Permissions::inMetaGroups(['commencement__edit', 'commencement__signupothers
         throw new RedirectException(new URL('_form.html?for=' . $for->value()));
     }
     echo $form;
-} elseif (true || $window->open()) {
+} elseif ($window->open()) {
     if (Permissions::inGroup('users')) {
         // signup interface for regular users
         $netIDs = OUS::userNetIDs(Session::uuid());
@@ -83,5 +83,5 @@ if ($window->open()) {
 echo Templates::render('commencement/signup/intro_' . $window->type() . '.php');
 
 if (in_array($window->type(), Config::get('commencement.student_signup_types'))) {
-    echo Templates::render('commencement/student_eligibility.php', ['semester' => $window->parentPage()->semester()]);
+    echo Templates::render('commencement/student_eligibility.php', ['semester' => $window->commencement()->semester()]);
 }

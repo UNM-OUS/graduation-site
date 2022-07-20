@@ -30,13 +30,15 @@ while ($window = $windows->fetch()) {
         );
     } elseif ($window->pending()) {
         printf(
-            '<li><strong>%s</strong><small> opens %s</small></li>',
+            '<li><a href="%s"><strong>%s</strong></a><small> opens %s</small></li>',
+            $window->url(),
             $window->name(),
             Format::datetime($window->start())
         );
     } else {
         printf(
-            '<li><strong>%s</strong><small> closed %s</small></li>',
+            '<li><a href="%s"><strong>%s</strong></a><small> closed %s</small></li>',
+            $window->url(),
             $window->name(),
             Format::datetime($window->end())
         );

@@ -8,7 +8,7 @@ use DigraphCMS_Plugins\unmous\ous_digraph_module\Semester;
 
 class Degree
 {
-    protected $existing = false;
+    protected $id = false;
     protected $override;
     protected $userid, $netid, $firstname, $lastname;
     protected $status, $semester, $level, $college, $department, $program;
@@ -104,7 +104,7 @@ class Degree
 
     public function delete()
     {
-        if ($id = $this->existing()) {
+        if ($id = $this->id()) {
             DB::query()->delete('degree', $id)->execute();
         }
     }
@@ -120,13 +120,13 @@ class Degree
             }
         }
         // do actual saving
-        if ($this->existing() !== null) $this->update();
+        if ($this->id() !== null) $this->update();
         else $this->insert();
     }
 
-    protected function existing(): ?int
+    public function id(): ?int
     {
-        if ($this->existing === false) {
+        if ($this->id === false) {
             $existing = DB::query()->from('degree')
                 ->where('override = ?', [$this->override])
                 ->where('userid = ?', [$this->userid])
@@ -137,11 +137,11 @@ class Degree
                 ->where('program = ?', [$this->program])
                 ->where('major1 = ?', [$this->major1])
                 ->fetch();
-            $this->existing = $existing
+            $this->id = $existing
                 ? $existing['id']
                 : null;
         }
-        return $this->existing;
+        return $this->id;
     }
 
     protected function insert()
@@ -183,7 +183,7 @@ class Degree
         ];
         if ($this->netID()) $row['netid'] = $this->netID();
         DB::query()->update('degree', $row)
-            ->where('id = ?', [$this->existing()])
+            ->where('id = ?', [$this->id()])
             ->execute();
     }
 

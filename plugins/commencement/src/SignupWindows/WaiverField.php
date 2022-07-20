@@ -25,7 +25,7 @@ class WaiverField extends FIELDSET
 
     public function value(bool $useDefault = false)
     {
-        return $This->checkbox->value($useDefault);
+        return $this->checkbox->value($useDefault);
     }
 
     public function default()

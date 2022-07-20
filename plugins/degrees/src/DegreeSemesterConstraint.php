@@ -112,10 +112,10 @@ class DegreeSemesterConstraint
     {
         $clause = [];
         // set status section to either specified value or OR clause to limit to pending/awarded
-        $clause[] = sprintf('degreestatus = ?', DB::pdo()->quote($onlyStatusType));
+        $clause[] = 'gradstatus = ' . DB::pdo()->quote($onlyStatusType);
         // set start/end clauses
-        if ($range->start()) $clause = 'semester >= ' . $range->start()->intVal();
-        if ($range->end()) $clause = 'semester <= ' . $range->start()->intVal();
+        if ($range->start()) $clause[] = 'semester >= ' . $range->start()->intVal();
+        if ($range->end()) $clause[] = 'semester <= ' . $range->end()->intVal();
         return sprintf('(%s)', implode(' AND ', $clause));
     }
 }

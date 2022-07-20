@@ -11,12 +11,6 @@ use Envms\FluentPDO\Queries\Select;
  */
 class SignupWindowSelect extends PageSelect
 {
-    /**
-     * Construct using a FPDO query and the class of the DataObjectSource that
-     * spawned this query.
-     *
-     * @param Select $query
-     */
     public function __construct(Select $query)
     {
         parent::__construct($query);
