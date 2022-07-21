@@ -44,6 +44,7 @@ use DigraphCMS\Spreadsheets\SpreadsheetReader;
 use DigraphCMS\UI\Notifications;
 use DigraphCMS\URL\URL;
 use DigraphCMS_Plugins\unmous\degrees\Degree;
+use DigraphCMS_Plugins\unmous\ous_digraph_module\PersonInfo;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\Semester;
 
 echo '<div class="notification-frame" data-target="_frame" id="upload_update_ui">';
@@ -75,8 +76,17 @@ if (Context::arg('job')) {
             // function to import row
             function (array $row, DeferredJob $job) {
                 try {
+                    // add to degree table
                     $degree = Degree::fromImportRow($row, $job->group());
                     $degree->save();
+                    // save info into personinfo
+                    if ($degree->netID()) {
+                        PersonInfo::setFor($degree->netID(), [
+                            'firstname' => $degree->firstName(),
+                            'lastname' => $degree->lastName()
+                        ]);
+                    }
+                    // return status
                     return $degree->netID() . ': added';
                 } catch (\Throwable $th) {
                     return $row['netid'] . ': ' . $th->getMessage();

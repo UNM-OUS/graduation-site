@@ -77,7 +77,7 @@ class RegaliaInformationForm extends DIV
             $div->addChild(sprintf('<p><small><a href="%s">Edit regalia information</a></small></p>', $editURL));
             return $div;
         } else {
-            $div->addChild('<p>No regalia information on file, please complete this section.</p>');
+            $div->addChild('<p>No regalia information on file. Please complete this section to enter your regalia sizing and degree information. Your information will be automatically saved for next time you need to rent regalia.</p>');
             $div->addChild(sprintf('<a href="%s" class="button">Enter regalia information</a>', $editURL));
             return $div;
         }

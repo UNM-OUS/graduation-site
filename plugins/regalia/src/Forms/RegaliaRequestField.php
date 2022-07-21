@@ -24,9 +24,20 @@ class RegaliaRequestField extends FIELDSET
         $this->addClass('regalia-request-field');
         // validator to require either opting out or an existing person record
         $this->needsRegalia->addValidator(function () {
-            if ($this->needsRegalia->value()) return null;
-            if (!Regalia::getPersonInfo($this->for)) return "You must either opt out of regalia rental or enter the information necessary to pick the regalia that you need";
+            if (!$this->needsRegalia->value()) return null;
+            elseif (!Regalia::getPersonInfo($this->for)) return "You must either opt out of regalia rental or enter the information necessary to pick the regalia that you need";
+            else return null;
         });
+    }
+
+    /**
+     * @param string $tip
+     * @return $this
+     */
+    public function addTip(string $tip)
+    {
+        $this->needsRegalia->addTip($tip);
+        return $this;
     }
 
     /**

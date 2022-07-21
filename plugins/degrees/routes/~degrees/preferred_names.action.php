@@ -10,6 +10,7 @@ use DigraphCMS\UI\Notifications;
 use DigraphCMS\UI\Pagination\ColumnSortingHeader;
 use DigraphCMS\UI\Pagination\PaginatedTable;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\Forms\NetIDInput;
+use DigraphCMS_Plugins\unmous\ous_digraph_module\PersonInfo;
 
 // form to add a new preferred name
 echo "<h2>Add preferred name</h2>";
@@ -43,6 +44,12 @@ if ($form->ready()) {
         ])->execute();
         Notifications::flashConfirmation('Inserted new preferred name for ' . $netid->value());
     }
+    // save into personinfo
+    PersonInfo::setFor($netid->value(), [
+        'firstname' => $firstName->value(),
+        'lastname' => $lastName->value(),
+        'fullname' => ($firstName->value() && $lastName->value()) ? $firstName->value() . ' ' . $lastName->value() : ''
+    ]);
     // update all records in degrees
     $update = array_filter([
         'firstname' => $firstName->value(),

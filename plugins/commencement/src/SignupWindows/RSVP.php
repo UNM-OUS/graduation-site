@@ -183,7 +183,7 @@ class RSVP extends FlatArray
     {
         if (!$this->form) {
             // look up person info by $for and pre-fill whatever is possible by merging it into flatarray data
-            $person = PersonInfo::forNetID($this->for);
+            $person = PersonInfo::fetch($this->for);
             if ($person) {
                 $this->merge([
                     'name' => $person->fullName(),
@@ -272,6 +272,8 @@ class RSVP extends FlatArray
 
         $regalia = (new RegaliaRequestField('Regalia rental', $this->for))
             ->setDefault($this['regalia'] ?? PersonInfo::getFor($this->for, 'regalia') ?? true)
+            ->addTip('Academic regalia is required to attend commencement, if you do not check this box you must have your own regalia to wear.')
+            ->addTip('If you have already ordered rental regalia through graduation.unm.edu for one or more convocations, please also order it here. The orders will be combined automatically.')
             ->addForm($form);
 
         $form->addCallback(function () use ($role, $regalia) {
