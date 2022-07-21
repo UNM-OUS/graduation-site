@@ -32,6 +32,7 @@ if (!$rsvp->window()->ended() || Permissions::inMetaGroup('commencement__edit'))
     echo (new CallbackLink(function () use ($rsvp) {
         $rsvp->setCancelled(!$rsvp->cancelled())
             ->save();
+        // TODO: Send cancellation status email
     }))->addChild($rsvp->cancelled() ? "Un-cancel this RSVP" : "Cancel this RSVP")
         ->setData('target', '_frame');
     // separator
@@ -53,7 +54,7 @@ $data = [
     ['Role at Commencement', $rsvp['role']],
     ['Regalia', $rsvp['regalia'] ? 'Regalia rental requested' : null],
     ['Hooder', $rsvp->hooder()],
-    ['Degree', implode(', ', [$rsvp['degree']['college'], $rsvp['degree']['program']])],
+    ['Degree', $rsvp['degree'] ? implode(', ', [$rsvp['degree']['college'], $rsvp['degree']['program']]) : ''],
 ];
 
 if ($rsvp['accommodations']) $data[] = ['Accommodations', [

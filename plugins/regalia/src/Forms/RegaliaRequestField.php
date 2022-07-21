@@ -43,12 +43,12 @@ class RegaliaRequestField extends FIELDSET
 
     public function value(bool $useDefault = false)
     {
-        return !$this->needsRegalia->value($useDefault);
+        return $this->needsRegalia->value($useDefault);
     }
 
     public function default(): bool
     {
-        return !$this->needsRegalia->default();
+        return $this->needsRegalia->default();
     }
 
     /**
@@ -59,7 +59,7 @@ class RegaliaRequestField extends FIELDSET
      */
     public function setDefault(bool $default)
     {
-        $this->needsRegalia->setDefault(!$default);
+        $this->needsRegalia->setDefault($default);
         return $this;
     }
 }

@@ -18,7 +18,7 @@ class RSVPs
     {
         if (!count($netIDs)) return null;
         return static::select($window)
-            ->where('for in (' . implode(',', array_map([DB::pdo(), 'quote'], $netIDs)) . ')');
+            ->where('`for` in (' . implode(',', array_map([DB::pdo(), 'quote'], $netIDs)) . ')');
     }
 
     /**

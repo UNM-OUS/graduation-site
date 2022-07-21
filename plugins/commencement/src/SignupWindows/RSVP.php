@@ -17,6 +17,7 @@ use DigraphCMS\Users\Users;
 use DigraphCMS_Plugins\unmous\degrees\Degrees;
 use DigraphCMS_Plugins\unmous\degrees\DegreeSemesterConstraint;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\Forms\AccommodationsField;
+use DigraphCMS_Plugins\unmous\ous_digraph_module\PersonInfo;
 use DigraphCMS_Plugins\unmous\regalia\Forms\RegaliaRequestField;
 use Flatrr\FlatArray;
 
@@ -167,7 +168,7 @@ class RSVP extends FlatArray
             // insert new signup
             return !!DB::query()->insertInto('commencement_signup', [
                 'uuid' => $this->uuid,
-                'for' => $this->for,
+                '`for`' => $this->for,
                 'window' => $this->window,
                 'created' => $this->created()->getTimestamp(),
                 'created_by' => $this->createdBy()->uuid(),
@@ -181,7 +182,15 @@ class RSVP extends FlatArray
     public function form(): FormWrapper
     {
         if (!$this->form) {
-            // TODO: look up user by $for and pre-fill whatever is possible by merging it into flatarray data
+            // look up person info by $for and pre-fill whatever is possible by merging it into flatarray data
+            $person = PersonInfo::forNetID($this->for);
+            if ($person) {
+                $this->merge([
+                    'name' => $person->fullName(),
+                    'accommodations' => $person['accommodations'],
+                    'email' => $person['email']
+                ], null, false);
+            }
             // specifically looking to prefill keys name, email, regalia, accommodations
             // first look in degrees for name
             if (!$this['name']) {
@@ -204,7 +213,7 @@ class RSVP extends FlatArray
             // add pronunciation for students only
             $pronunciation = null;
             if (in_array($this->window()->type(), Config::get('commencement.student_signup_types'))) {
-                $name->addTip('This field is autopopulated with the best name we could locate for you, but feel free to change it if you would like to have a different name read at the ceremony.');
+                $name->addTip('This field is autopopulated automatically, but feel free to change it if you would like to have a different name read at the ceremony.');
                 $pronunciation = (new Field('Name pronunciation'))
                     ->addTip('Instructions for the readers to help them pronounce your name, if you are worried they may not do so correctly')
                     ->addTip('For example Ada Lovelace might enter "Aye-Duh Luv-Lace" or Lobo Lucy might enter "Low-Bow Loo-See"')
@@ -239,6 +248,14 @@ class RSVP extends FlatArray
                 $this['email'] = $email->value();
                 $this['accommodations'] = $accommodations->value();
                 $this['waiver'] = $waiver->value();
+                // save person info data
+                PersonInfo::setFor($this->for, [
+                    'fullname' => $name->value(),
+                    'accommodations' => $accommodations->value(),
+                    'phone' => @$accommodations->value()['phone'],
+                    'email' => $email->value(),
+                    'pronunciation' => $pronunciation ? $pronunciation->value() : null
+                ]);
                 // actually do writing
                 $this->save();
             });
@@ -249,16 +266,23 @@ class RSVP extends FlatArray
     protected function facultyForm(FormWrapper $form)
     {
         $role = (new Field('Role at Commencement', new SELECT(Config::get('commencement.faculty_roles'))))
-            ->setDefault($this['role'])
-            ->setRequired(true);
+            ->setDefault($this['role'] ?? PersonInfo::getFor($this->for, 'commencement_role'))
+            ->setRequired(true)
+            ->addForm($form);
 
         $regalia = (new RegaliaRequestField('Regalia rental', $this->for))
-            ->setDefault($this['regalia'] ?? true)
+            ->setDefault($this['regalia'] ?? PersonInfo::getFor($this->for, 'regalia') ?? true)
             ->addForm($form);
 
         $form->addCallback(function () use ($role, $regalia) {
+            // set values
             $this['role'] = $role->value();
             $this['regalia'] = $regalia->value();
+            // save into person info
+            PersonInfo::setFor($this->for, [
+                'regalia' => $regalia->value(),
+                'commencement_role' => $role->value()
+            ]);
         });
     }
 
@@ -274,7 +298,7 @@ class RSVP extends FlatArray
         $hooder = null;
         if ($this->window()->type() == 'terminal') {
             $hooder = (new HooderField('Faculty hooder'))
-                ->setDefault($this['hooder']);
+                ->setDefault($this['hooder'] ?? PersonInfo::getFor($this->for, 'hooder'));
             $form->addChild($hooder);
         }
 
@@ -290,8 +314,13 @@ class RSVP extends FlatArray
                 'major1' => $degree->major1(),
                 'dissertation' => $degree->dissertation()
             ];
+            // TODO: if hooder information has changed, email hooder
             // save hooder info
             if ($hooder) $this['hooder'] = $hooder->value();
+            // save hooder info into person info
+            if ($hooder) {
+                PersonInfo::setFor($this->netid, ['hooder' => $hooder->value()]);
+            }
         });
     }
 }
