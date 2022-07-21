@@ -2,11 +2,17 @@
 
 namespace DigraphCMS_Plugins\unmous\commencement\SignupWindows;
 
+use DigraphCMS\Content\Pages;
 use DigraphCMS\DB\DB;
 
 class SignupWindows
 {
-    public function select(): SignupWindowSelect
+    public static function get(string $uuid): ?SignupWindow
+    {
+        return Pages::get($uuid);
+    }
+
+    public static function select(): SignupWindowSelect
     {
         return new SignupWindowSelect(
             DB::query()->from('page')
@@ -14,7 +20,7 @@ class SignupWindows
         );
     }
 
-    public function for(string $uuid): SignupWindowSelect
+    public static function for(string $uuid): SignupWindowSelect
     {
         return new SignupWindowSelect(
             DB::query()->from('page_link')

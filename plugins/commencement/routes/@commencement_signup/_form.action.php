@@ -11,7 +11,7 @@ use DigraphCMS\UI\Pagination\PaginatedTable;
 use DigraphCMS\UI\Templates;
 use DigraphCMS\URL\URL;
 use DigraphCMS\Users\Permissions;
-use DigraphCMS_Plugins\unmous\commencement\SignupWindows\Signup;
+use DigraphCMS_Plugins\unmous\commencement\SignupWindows\RSVP;
 use DigraphCMS_Plugins\unmous\commencement\SignupWindows\SignupWindow;
 use DigraphCMS_Plugins\unmous\degrees\Degree;
 use DigraphCMS_Plugins\unmous\degrees\Degrees;
@@ -20,12 +20,6 @@ use DigraphCMS_Plugins\unmous\ous_digraph_module\OUS;
 
 /** @var SignupWindow */
 $window = Context::page();
-
-// basic permissions, is a user, window is open or user has special permissions
-Permissions::requireGroup('users');
-if (!$window->open() && !Permissions::inMetaGroup('commencement__edit')) {
-    throw new AccessDeniedError("This signup window is closed");
-}
 
 // figure out who this  signup will be for
 $for = Permissions::inMetaGroups(['commencement__edit', 'commencement__signupothers'])
@@ -39,6 +33,13 @@ if (!$for) {
     } else $for = $netIDs[0];
 }
 $for = htmlspecialchars($for);
+
+// basic permissions, is a user, window is open or user has special permissions
+Permissions::requireGroup('users');
+$rsvp = RSVP::getFor($for, $window);
+if (!($window->open() || (!$window->ended() && $rsvp->exists()) || Permissions::inMetaGroup('commencement__edit'))) {
+    throw new AccessDeniedError("This signup window is closed");
+}
 
 // special degree-checking for student signups
 if (in_array($window->type(), Config::get('commencement.student_signup_types'))) {
@@ -71,12 +72,10 @@ if (in_array($window->type(), Config::get('commencement.student_signup_types')))
     }
 }
 
-// get and print signup
-$signup = new Signup($for, $window);
-
-$form = $signup->form();
-$form->addCallback(function () use ($signup) {
-    throw new RedirectException($signup->url());
+// get and print form
+$form = $rsvp->form();
+$form->addCallback(function () use ($rsvp) {
+    throw new RedirectException($rsvp->url());
 });
 
 echo $form;

@@ -6,13 +6,15 @@ use DigraphCMS\HTML\A;
 use DigraphCMS\HTML\Forms\Field;
 use DigraphCMS\HTML\Forms\FormWrapper;
 use DigraphCMS\HTTP\RedirectException;
-use DigraphCMS\Session\Session;
 use DigraphCMS\UI\Format;
 use DigraphCMS\UI\Notifications;
+use DigraphCMS\UI\Pagination\PaginatedList;
 use DigraphCMS\UI\Templates;
 use DigraphCMS\URL\URL;
 use DigraphCMS\Users\Permissions;
 use DigraphCMS\Users\Users;
+use DigraphCMS_Plugins\unmous\commencement\SignupWindows\RSVP;
+use DigraphCMS_Plugins\unmous\commencement\SignupWindows\RSVPs;
 use DigraphCMS_Plugins\unmous\commencement\SignupWindows\SignupWindow;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\Forms\EmailOrNetIDInput;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\Forms\NetIDInput;
@@ -23,7 +25,30 @@ $window = Context::page();
 
 printf('<h1>%s</h1>', $window->name());
 
+// existing signups
+$netIDs = OUS::userNetIDs();
+if ($netIDs) {
+    $existing = RSVPs::getForNetIDs($netIDs, $window);
+    if ($existing->count()) {
+        echo "<div class='card card--confirmation'>";
+        echo "<strong>Existing:</strong>";
+        while ($e = $existing->fetch()) {
+            printf('<div><a href="%s">RSVP for %s%s</a></div>', $e->url(), $e->name(), ($e->cancelled() ? ' <strong>(cancelled)</strong>' : ''));
+        }
+        echo "</div>";
+    }
+}
+
+// create new signup interface
 if (Permissions::inMetaGroups(['commencement__edit', 'commencement__signupothers'])) {
+    // list created-by signups for fancy people
+    $byMe = RSVPs::getByCreator(Users::current(), $window);
+    if ($byMe->count()) {
+        echo "<h2>Created by me</h2>";
+        echo new PaginatedList($byMe, function (RSVP $rsvp) {
+            return sprintf('<a href="%s">%s%s</a>', $rsvp->url(), $rsvp->name(), ($rsvp->cancelled() ? ' <strong>(cancelled)</strong>' : ''));
+        });
+    }
     // signup interface for fancy people
     $form = new FormWrapper();
     $form->button()->setText('Begin RSVP');
@@ -47,14 +72,14 @@ if (Permissions::inMetaGroups(['commencement__edit', 'commencement__signupothers
 } elseif ($window->open()) {
     if (Permissions::inGroup('users')) {
         // signup interface for regular users
-        $netIDs = OUS::userNetIDs(Session::uuid());
+        $netIDs = OUS::userNetIDs();
         // list existing RSVPs for these NetIDs
         $rsvps = [];
         // display options to create an RSVP
         if (!$netIDs) Notifications::printError('There are no NetIDs associated with your account');
         elseif (count($netIDs) == 1 && !$rsvps) {
             // display interface for user with one netid
-            echo (new A(new URL('_form.html?for=' . $netIDs[0])))->addChild('RSVP for event')->addClass('button');
+            if (!$existing->count()) echo (new A(new URL('_form.html?for=' . $netIDs[0])))->addChild('RSVP for event')->addClass('button');
         } else {
             // display interface for user with multiple netids
         }
@@ -63,6 +88,7 @@ if (Permissions::inMetaGroups(['commencement__edit', 'commencement__signupothers
     }
 }
 
+// display metadata about dates
 if ($window->open()) {
     printf(
         '<p><em>Closes %s</small></em></p>',

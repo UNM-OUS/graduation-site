@@ -11,7 +11,6 @@ use DigraphCMS\HTML\Forms\Field;
 use DigraphCMS\HTML\Forms\FormWrapper;
 use DigraphCMS\HTML\Forms\SELECT;
 use DigraphCMS\Session\Session;
-use DigraphCMS\UI\Format;
 use DigraphCMS\URL\URL;
 use DigraphCMS\Users\User;
 use DigraphCMS\Users\Users;
@@ -21,11 +20,18 @@ use DigraphCMS_Plugins\unmous\ous_digraph_module\Forms\AccommodationsField;
 use DigraphCMS_Plugins\unmous\regalia\Forms\RegaliaRequestField;
 use Flatrr\FlatArray;
 
-class Signup extends FlatArray
+class RSVP extends FlatArray
 {
     protected $for, $window, $uuid;
     protected $form;
     protected $created, $created_by, $updated, $updated_by;
+
+    public static function getFor(string $for, SignupWindow $window)
+    {
+        $uuid = static::computeUUID($for, $window->uuid());
+        return RSVPs::get($uuid, $window)
+            ?? new RSVP($for, $window);
+    }
 
     public function __construct(
         string $for,
@@ -37,8 +43,8 @@ class Signup extends FlatArray
         DateTime $updated = null
     ) {
         $this->for = $for;
-        $this->window = $window;
-        $this->uuid = substr($window->uuid(), 0, 4) . Digraph::uuid(null, implode(' ', [$for, $window->uuid()]));
+        $this->window = $window->uuid();
+        $this->uuid = static::computeUUID($for, $window->uuid());
         // set created/updated
         $this->created = $created ?? new DateTime();
         $this->created_by = $created_by ?? Users::current() ?? Users::guest();
@@ -46,6 +52,21 @@ class Signup extends FlatArray
         $this->updated_by = $updated_by ?? Users::current() ?? Users::guest();
         // merge in provided data
         $this->merge($data, null, true);
+    }
+
+    protected static function computeUUID(string $for, string $windowUUID): string
+    {
+        return substr($windowUUID, 0, 4) . Digraph::uuid(null, implode(' ', [$for, $windowUUID]));
+    }
+
+    public function for(): string
+    {
+        return $this->for;
+    }
+
+    public function window(): SignupWindow
+    {
+        return SignupWindows::get($this->window);
     }
 
     public function name(): string
@@ -61,6 +82,16 @@ class Signup extends FlatArray
     public function email(): string
     {
         return htmlspecialchars($this['email']);
+    }
+
+    /**
+     * @param boolean $cancelled
+     * @return $this
+     */
+    public function setCancelled(bool $cancelled)
+    {
+        $this['cancelled'] = $cancelled;
+        return $this;
     }
 
     public function cancelled(): bool
@@ -92,7 +123,7 @@ class Signup extends FlatArray
 
     public function url(): URL
     {
-        return $this->window->url('signup_' . $this->uuid());
+        return $this->window()->url('signup_' . $this->uuid());
     }
 
     public function created(): DateTime
@@ -115,9 +146,16 @@ class Signup extends FlatArray
         return $this->updated_by;
     }
 
+    public function exists(): bool
+    {
+        return !!DB::query()->from('commencement_signup')
+            ->where('uuid = ?', [$this->uuid])
+            ->count();
+    }
+
     public function save(): bool
     {
-        if (DB::query()->from('commencement_signup')->where('uuid = ?', [$this->uuid])->count()) {
+        if ($this->exists()) {
             // update existing signup
             return !!DB::query()->update('commencement_signup', [
                 'updated' => time(),
@@ -130,7 +168,7 @@ class Signup extends FlatArray
             return !!DB::query()->insertInto('commencement_signup', [
                 'uuid' => $this->uuid,
                 'for' => $this->for,
-                'window' => $this->window->uuid(),
+                'window' => $this->window,
                 'created' => $this->created()->getTimestamp(),
                 'created_by' => $this->createdBy()->uuid(),
                 'updated' => $this->updated()->getTimestamp(),
@@ -147,7 +185,7 @@ class Signup extends FlatArray
             // specifically looking to prefill keys name, email, regalia, accommodations
             // first look in degrees for name
             if (!$this['name']) {
-                $eligible = DegreeSemesterConstraint::forCommencement($this->window->commencement()->semester())->degrees();
+                $eligible = DegreeSemesterConstraint::forCommencement($this->window()->commencement()->semester())->degrees();
                 $eligible->where('netid = ?', [$this->for]);
                 if ($degree = $eligible->fetch()) {
                     $this['name'] = $this['name'] ?? $degree->firstName() . ' ' . $degree->lastName();
@@ -165,7 +203,7 @@ class Signup extends FlatArray
                 ->addForm($this->form);
             // add pronunciation for students only
             $pronunciation = null;
-            if (in_array($this->window->type(), Config::get('commencement.student_signup_types'))) {
+            if (in_array($this->window()->type(), Config::get('commencement.student_signup_types'))) {
                 $name->addTip('This field is autopopulated with the best name we could locate for you, but feel free to change it if you would like to have a different name read at the ceremony.');
                 $pronunciation = (new Field('Name pronunciation'))
                     ->addTip('Instructions for the readers to help them pronounce your name, if you are worried they may not do so correctly')
@@ -179,28 +217,27 @@ class Signup extends FlatArray
                 ->setRequired(true)
                 ->addForm($this->form);
             // add faculty fields
-            if (in_array($this->window->type(), Config::get('commencement.faculty_signup_types'))) {
+            if (in_array($this->window()->type(), Config::get('commencement.faculty_signup_types'))) {
                 $this->facultyForm($this->form);
             }
             // add student fields
-            if (in_array($this->window->type(), Config::get('commencement.student_signup_types'))) {
+            if (in_array($this->window()->type(), Config::get('commencement.student_signup_types'))) {
                 $this->studentForm($this->form);
             }
             // add accommodations
-            $accomodations = (new AccommodationsField('Accommodations', true))
+            $accommodations = (new AccommodationsField('Accommodations', true))
                 ->setDefault($this['accommodations']);
-            $this->form->addChild($accomodations);
+            $this->form->addChild($accommodations);
             // add waiver
-            $waiver = (new WaiverField)
-                ->setDefault($this['waiver']);
+            $waiver = new WaiverField;
             $this->form->addChild($waiver);
             // add callback
-            $this->form->addCallback(function () use ($name, $pronunciation, $email, $accomodations, $waiver) {
+            $this->form->addCallback(function () use ($name, $pronunciation, $email, $accommodations, $waiver) {
                 // update values from form
                 $this['name'] = $name->value();
                 if ($pronunciation) $this['pronunciation'] = $pronunciation->value();
                 $this['email'] = $email->value();
-                $this['accommodations'] = $accomodations->value();
+                $this['accommodations'] = $accommodations->value();
                 $this['waiver'] = $waiver->value();
                 // actually do writing
                 $this->save();
@@ -227,7 +264,7 @@ class Signup extends FlatArray
 
     protected function studentForm(FormWrapper $form)
     {
-        $degree = (new DegreeField('Degree to be recognized', $this->for, $this->window->commencement()->semester()))
+        $degree = (new DegreeField('Degree to be recognized', $this->for, $this->window()->commencement()->semester()))
             ->setDefault($this['degree.id'])
             ->addTip('Due to time constraints students can only be recognized for a single degree, and only doctoral/terminal students will have their majors read.')
             ->addTip('Only your name is read for undergraduate and Master\'s degree students, and your selection here is only used to plan how much seating is necessary for your School/College.')
@@ -235,7 +272,7 @@ class Signup extends FlatArray
             ->addForm($form);
 
         $hooder = null;
-        if ($this->window->type() == 'terminal') {
+        if ($this->window()->type() == 'terminal') {
             $hooder = (new HooderField('Faculty hooder'))
                 ->setDefault($this['hooder']);
             $form->addChild($hooder);

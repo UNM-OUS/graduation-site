@@ -6,11 +6,21 @@ use DateTime;
 use DigraphCMS\Config;
 use DigraphCMS\Content\AbstractPage;
 use DigraphCMS\Content\Graph;
+use DigraphCMS\URL\URL;
+use DigraphCMS\Users\Permissions;
+use DigraphCMS\Users\User;
 use DigraphCMS_Plugins\unmous\commencement\CommencementEvent;
 
 class SignupWindow extends AbstractPage
 {
     const DEFAULT_SLUG = '[uuid]';
+
+    public function permissions(URL $url, ?User $user = null): ?bool
+    {
+        if ($url->action() == '_form') return Permissions::inGroup('users');
+        elseif (substr($url->action(), 0, 7) == 'signup_') return Permissions::inGroup('users');
+        else return parent::permissions($url, $user);
+    }
 
     public function commencement(): CommencementEvent
     {

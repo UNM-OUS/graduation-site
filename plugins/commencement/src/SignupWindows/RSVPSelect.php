@@ -8,14 +8,14 @@ use DigraphCMS\DB\AbstractMappedSelect;
 use DigraphCMS\Users\Users;
 
 /**
- * @method Signup|null fetch()
- * @method Signup[] fetchAll()
+ * @method RSVP|null fetch()
+ * @method RSVP[] fetchAll()
  */
-class SignupSelect extends AbstractMappedSelect
+class RSVPSelect extends AbstractMappedSelect
 {
     protected function doRowToObject(array $row)
     {
-        return new Signup(
+        return new RSVP(
             $row['for'],
             Pages::get($row['window']),
             json_decode($row['data'], true),
