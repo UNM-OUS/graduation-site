@@ -1,15 +1,17 @@
 <?php
 
 use DigraphCMS\Context;
+use DigraphCMS_Plugins\unmous\degrees\DegreeSemesterConstraint;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\Semesters;
 
 $semester = Context::fields()['semester'] ?? Semesters::current()->next();
+$constraint = DegreeSemesterConstraint::forCommencement($semester);
 
 ?>
 <div class="card card--light">
     <h1>Student signup eligibility</h1>
     <p>
-        To sign up for Commencement, you must have a degree record in the Banner database, listed as "pending" for <?php echo $semester; ?> or earlier.
+        To sign up for Commencement, your adviser must have entered a degree record for you in the Banner database, listed as <em><?php echo $constraint; ?></em>.
         Questions about your degree status should be directed first to your academic advisor, and then the Office of the Registrar.
     </p>
     <p>
