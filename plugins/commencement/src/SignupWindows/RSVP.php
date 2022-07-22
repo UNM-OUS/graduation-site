@@ -6,11 +6,14 @@ use DateTime;
 use DigraphCMS\Config;
 use DigraphCMS\DB\DB;
 use DigraphCMS\Digraph;
+use DigraphCMS\Email\Email as EmailMessage;
+use DigraphCMS\Email\Emails;
 use DigraphCMS\HTML\Forms\Email;
 use DigraphCMS\HTML\Forms\Field;
 use DigraphCMS\HTML\Forms\FormWrapper;
 use DigraphCMS\HTML\Forms\SELECT;
 use DigraphCMS\Session\Session;
+use DigraphCMS\UI\Templates;
 use DigraphCMS\URL\URL;
 use DigraphCMS\Users\User;
 use DigraphCMS\Users\Users;
@@ -166,7 +169,7 @@ class RSVP extends FlatArray
                 ->execute();
         } else {
             // insert new signup
-            return !!DB::query()->insertInto('commencement_signup', [
+            $out = !!DB::query()->insertInto('commencement_signup', [
                 'uuid' => $this->uuid,
                 '`for`' => $this->for,
                 'window' => $this->window,
@@ -176,7 +179,50 @@ class RSVP extends FlatArray
                 'updated_by' => $this->updatedBy()->uuid(),
                 'data' => json_encode($this->get())
             ])->execute();
+            // send confirmation email to all interested parties
+            if ($out) $this->sendNotificationEmail('created');
+            // return result
+            return $out;
         }
+    }
+
+    public function sendNotificationEmail(string $template, array $additionalRecipients = [])
+    {
+        $recipients = array_unique(array_merge(
+            $this->notificationEmailRecipients(),
+            array_map('strtolower', $additionalRecipients)
+        ));
+        foreach ($recipients as $address) {
+            Emails::send(new EmailMessage(
+                'service',
+                Config::get('commencement.rsvp_email_subjects.' . $template) ?? 'Commencement RSVP notification',
+                $address,
+                null,
+                'graduation@unm.edu',
+                Templates::render("commencement/rsvp_emails/$template.php", ['rsvp' => $this]),
+                null,
+                null,
+                'graduation@unm.edu'
+            ));
+        }
+    }
+
+    public function notificationEmailRecipients(): array
+    {
+        $recipients = [];
+        // "for" field
+        if (strpos('@', $this->for) !== false) $recipients[] = $this->for . '@unm.edu';
+        else $recipients[] = $this->for;
+        // contact email field
+        if ($this['email']) $recipients = $this['email'];
+        // creator primary email
+        if ($this->createdBy()->primaryEmail()) $recipients[] = $this->createdBy()->primaryEmail();
+        // updater primary email
+        if ($this->updatedBy()->primaryEmail()) $recipients[] = $this->updatedBy()->primaryEmail();
+        // make everything lower case
+        $recipients = array_map('strtolower', $recipients);
+        // return unique values
+        return array_unique($recipients);
     }
 
     public function form(): FormWrapper
@@ -316,12 +362,32 @@ class RSVP extends FlatArray
                 'major1' => $degree->major1(),
                 'dissertation' => $degree->dissertation()
             ];
-            // TODO: if hooder information has changed, email hooder
-            // save hooder info
-            if ($hooder) $this['hooder'] = $hooder->value();
-            // save hooder info into person info
+            // hooder stuff
             if ($hooder) {
-                PersonInfo::setFor($this->netid, ['hooder' => $hooder->value()]);
+                // if hooder information has changed, email hooder
+                if ($hooder->value() != $this['hooder'] && $hooder->value()['email']) {
+                    Emails::send(new EmailMessage(
+                        'system',
+                        'Commencement hooder request',
+                        $hooder->value()['email'],
+                        null,
+                        'graduation@unm.edu',
+                        Templates::render('commencement/rsvp_email/hooder_request.php', [
+                            'commencement' => $this->window()->commencement(),
+                            'hooder_name' => $hooder->value['name'],
+                            'hooder_email' => $hooder->value['email'],
+                            'student_name' => $this->name()
+                        ]),
+                        null,
+                        $this->email(),
+                        'graduation@unm.edu'
+                    ));
+                }
+                // save hooder info
+                unset($this['hooder']);
+                $this['hooder'] = $hooder->value();
+                // save hooder info into person info
+                PersonInfo::setFor($this->netid, ['hooder' => $hooder->value() ?? false]);
             }
         });
     }

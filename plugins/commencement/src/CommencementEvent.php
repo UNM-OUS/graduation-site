@@ -34,7 +34,7 @@ class CommencementEvent extends Page
         if (!$url || $url->action() == 'index') {
             if ($this->isPast()) return new URL('/past_commencements/');
             elseif ($this->isUpcoming()) return new URL('/future_commencements/');
-            else return new URL('/');
+            else return parent::parent($url);
         } else return parent::parent($url);
     }
 

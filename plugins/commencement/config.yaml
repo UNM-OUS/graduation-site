@@ -3,6 +3,10 @@ page_types:
   commencement_signup: \DigraphCMS_Plugins\unmous\commencement\SignupWindows\SignupWindow
 
 commencement:
+  rsvp_email_subjects:
+    created: Commencement RSVP confirmation
+    cancelled: Commencement RSVP cancelled
+    uncancelled: Commencement RSVP confirmation
   faculty_roles:
     faculty: Faculty honor processional
     platform: Platform member (including platform marshals)

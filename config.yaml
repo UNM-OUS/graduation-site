@@ -2,6 +2,10 @@ fields:
   site:
     name: Graduation Events
 
+# Disable emails entirely during development
+email:
+  enabled: false
+
 # Should be disabled in favor of actual cron jobs for non-sandbox sites
 cron:
   route_enabled: false

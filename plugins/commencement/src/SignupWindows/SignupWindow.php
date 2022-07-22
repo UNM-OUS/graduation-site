@@ -15,6 +15,16 @@ class SignupWindow extends AbstractPage
 {
     const DEFAULT_SLUG = '[uuid]';
 
+    public function isForFaculty(): bool
+    {
+        return in_array($this->type(), Config::get('commencement.faculty_signup_types'));
+    }
+
+    public function isForStudents(): bool
+    {
+        return in_array($this->type(), Config::get('commencement.student_signup_types'));
+    }
+
     public function permissions(URL $url, ?User $user = null): ?bool
     {
         if ($url->action() == '_form') return Permissions::inGroup('users');

@@ -32,7 +32,9 @@ if (!$rsvp->window()->ended() || Permissions::inMetaGroup('commencement__edit'))
     echo (new CallbackLink(function () use ($rsvp) {
         $rsvp->setCancelled(!$rsvp->cancelled())
             ->save();
-        // TODO: Send cancellation status email
+        // send status update email
+        if ($rsvp->cancelled()) $rsvp->sendNotificationEmail('cancelled');
+        else $rsvp->sendNotificationEmail('uncancelled');
     }))->addChild($rsvp->cancelled() ? "Un-cancel this RSVP" : "Cancel this RSVP")
         ->setData('target', '_frame');
     // separator

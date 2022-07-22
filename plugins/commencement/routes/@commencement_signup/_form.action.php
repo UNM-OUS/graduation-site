@@ -75,7 +75,6 @@ if (in_array($window->type(), Config::get('commencement.student_signup_types')))
 // get and print form
 $form = $rsvp->form();
 $form->addCallback(function () use ($rsvp) {
-    // TODO: Send confirmation email
     throw new RedirectException($rsvp->url());
 });
 
