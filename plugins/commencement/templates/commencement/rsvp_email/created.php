@@ -22,9 +22,9 @@ $commencement = $window->commencement();
 <?php
 
 // type-specific instructions
-if ($window->isForStudents()) echo Templates::render('commcencement/rsvp_email/_student_instructions.php');
-elseif ($window->isForFaculty()) echo Templates::render('commcencement/rsvp_email/_faculty_instructions.php');
-else echo Templates::render('commcencement/rsvp_email/_fallback_instructions.php');
+if ($window->isForStudents()) echo Templates::render('commencement/rsvp_email/_student_instructions.php');
+elseif ($window->isForFaculty()) echo Templates::render('commencement/rsvp_email/_faculty_instructions.php');
+else echo Templates::render('commencement/rsvp_email/_fallback_instructions.php');
 ?>
 
 <?php if ($rsvp['regalia']) : ?>

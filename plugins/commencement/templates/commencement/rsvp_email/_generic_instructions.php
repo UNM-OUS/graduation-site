@@ -14,7 +14,7 @@ $commencement = $window->commencement();
 <p>
     The ceremony <em>begins</em> <?php echo Format::date($commencement->time(), true, true); ?> promptly at <?php echo Format::time($commencement->time(), true, true); ?>.
     You will need to arrive earlier than that to provide time to park, check in, and be situated for your role.
-    You will get more precise instructions closer to the date of the ceremony, which will be tailored to you role in the ceremony.
+    You will get more precise instructions closer to the date of the ceremony, which will be tailored to your role in the ceremony.
 </p>
 
 <ul>

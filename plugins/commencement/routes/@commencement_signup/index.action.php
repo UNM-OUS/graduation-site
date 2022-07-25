@@ -31,7 +31,7 @@ if ($netIDs) {
     $existing = RSVPs::getForNetIDs($netIDs, $window);
     if ($existing->count()) {
         echo "<div class='card card--confirmation'>";
-        echo "<strong>Existing:</strong>";
+        echo "<h2>My RSVP</h2>";
         while ($e = $existing->fetch()) {
             printf('<div><a href="%s">RSVP for %s%s</a></div>', $e->url(), $e->name(), ($e->cancelled() ? ' <strong>(cancelled)</strong>' : ''));
         }
@@ -68,6 +68,7 @@ if (Permissions::inMetaGroups(['commencement__edit', 'commencement__signupothers
     if ($form->ready()) {
         throw new RedirectException(new URL('_form.html?for=' . $for->value()));
     }
+    echo "<h2>Create a new signup</h2>";
     echo $form;
 } elseif ($window->open()) {
     if (Permissions::inGroup('users')) {
@@ -79,7 +80,7 @@ if (Permissions::inMetaGroups(['commencement__edit', 'commencement__signupothers
         if (!$netIDs) Notifications::printError('There are no NetIDs associated with your account');
         elseif (count($netIDs) == 1 && !$rsvps) {
             // display interface for user with one netid
-            if (!$existing->count()) echo (new A(new URL('_form.html?for=' . $netIDs[0])))->addChild('RSVP for event')->addClass('button');
+            if (!$existing->count()) echo (new A(new URL('_form.html?for=' . $netIDs[0])))->addChild('Create my RSVP for Commencement')->addClass('button button--confirmation');
         } else {
             // display interface for user with multiple netids
         }

@@ -127,7 +127,7 @@ class RSVP extends FlatArray
 
     public function url(): URL
     {
-        return $this->window()->url('signup_' . $this->uuid());
+        return $this->window()->url('signup_' . $this->uuid())->setName($this->name());
     }
 
     public function created(): DateTime
@@ -199,7 +199,7 @@ class RSVP extends FlatArray
                 $address,
                 null,
                 'graduation@unm.edu',
-                Templates::render("commencement/rsvp_emails/$template.php", ['rsvp' => $this]),
+                Templates::render("commencement/rsvp_email/$template.php", ['rsvp' => $this]),
                 null,
                 null,
                 'graduation@unm.edu'
@@ -211,10 +211,10 @@ class RSVP extends FlatArray
     {
         $recipients = [];
         // "for" field
-        if (strpos('@', $this->for) !== false) $recipients[] = $this->for . '@unm.edu';
+        if (strpos('@', $this->for) === false) $recipients[] = $this->for . '@unm.edu';
         else $recipients[] = $this->for;
         // contact email field
-        if ($this['email']) $recipients = $this['email'];
+        if ($this['email']) $recipients[] = $this['email'];
         // creator primary email
         if ($this->createdBy()->primaryEmail()) $recipients[] = $this->createdBy()->primaryEmail();
         // updater primary email
@@ -258,12 +258,12 @@ class RSVP extends FlatArray
                 ->addForm($this->form);
             // add pronunciation for students only
             $pronunciation = null;
-            if (in_array($this->window()->type(), Config::get('commencement.student_signup_types'))) {
+            if ($this->window()->isForStudents()) {
                 $name->addTip('This field is autopopulated automatically, but feel free to change it if you would like to have a different name read at the ceremony.');
                 $pronunciation = (new Field('Name pronunciation'))
                     ->addTip('Instructions for the readers to help them pronounce your name, if you are worried they may not do so correctly')
                     ->addTip('For example Ada Lovelace might enter "Aye-Duh Luv-Lace" or Lobo Lucy might enter "Low-Bow Loo-See"')
-                    ->setDefault($this['pronunciation'])
+                    ->setDefault($this['pronunciation'] ?? PersonInfo::getFor($this->for(),'pronunciation'))
                     ->setRequired(false)
                     ->addForm($this->form);
             }
@@ -272,11 +272,11 @@ class RSVP extends FlatArray
                 ->setRequired(true)
                 ->addForm($this->form);
             // add faculty fields
-            if (in_array($this->window()->type(), Config::get('commencement.faculty_signup_types'))) {
+            if ($this->window()->isForFaculty()) {
                 $this->facultyForm($this->form);
             }
             // add student fields
-            if (in_array($this->window()->type(), Config::get('commencement.student_signup_types'))) {
+            if ($this->window()->isForStudents()) {
                 $this->studentForm($this->form);
             }
             // add accommodations

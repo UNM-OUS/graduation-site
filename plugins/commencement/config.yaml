@@ -14,17 +14,17 @@ commencement:
     hooder: I expect to hood a student
   signup_types:
     undergrad: Undergraduate student RSVP
-    masters: Masters student RSVP
+    master: Masters student RSVP
     terminal: Doctoral student RSVP
     faculty: Faculty RSVP
-  student_signup_types: [undergrad, masters, terminal]
+  student_signup_types: [undergrad, master, terminal]
   faculty_signup_types: [faculty]
   default_signups:
     - type: undergrad
       start: -54 days
       end: -8 days
       not_type: [graduate]
-    - type: masters
+    - type: master
       start: -54 days
       end: -8 days
       not_type: [undergraduate]

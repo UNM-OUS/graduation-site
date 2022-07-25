@@ -1,5 +1,6 @@
 <?php
 
+use DigraphCMS\Config;
 use DigraphCMS\Context;
 use DigraphCMS\HTTP\AccessDeniedError;
 use DigraphCMS\HTTP\HttpError;
@@ -53,7 +54,7 @@ $data = [
     ['Name', $rsvp->name()],
     ['Name pronunciation', $rsvp->pronunciation()],
     ['Email', $rsvp->email()],
-    ['Role at Commencement', $rsvp['role']],
+    ['Role at Commencement', Config::get('commencement.faculty_roles.' . $rsvp['role']) ?? $rsvp['role']],
     ['Regalia', $rsvp['regalia'] ? 'Regalia rental requested' : null],
     ['Hooder', $rsvp->hooder()],
     ['Degree', $rsvp['degree'] ? implode(', ', [$rsvp['degree']['college'], $rsvp['degree']['program']]) : ''],
