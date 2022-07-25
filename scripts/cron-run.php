@@ -2,6 +2,8 @@
 
 use DigraphCMS\Context;
 use DigraphCMS\Cron\Cron;
+use DigraphCMS\HTTP\Request;
+use DigraphCMS\HTTP\RequestHeaders;
 use DigraphCMS\URL\URL;
 use DigraphCMS\URL\URLs;
 use DigraphCMS\URL\WaybackMachine;
@@ -19,6 +21,7 @@ try {
     URLs::beginContext(new URL('/'));
     Context::begin();
     Context::url(new URL('/'));
+    Context::request(new Request(new URL('/~cron/'), 'get', new RequestHeaders(), []));
     set_time_limit(300);
     Cron::runJobs(time() + 120);
     Context::end();
