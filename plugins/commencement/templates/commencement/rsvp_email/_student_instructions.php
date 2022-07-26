@@ -11,10 +11,12 @@ $window = $rsvp->window();
 $commencement = $window->commencement();
 
 ?>
-<h2>Student/guest instructions</h2>
+<h2>Student instructions</h2>
+
 <p>
     The ceremony <em>begins</em> <?php echo Format::date($commencement->time(), true, true); ?> promptly at <?php echo Format::time($commencement->time(), true, true); ?>.
-    You should arrive by <?php echo Format::time($commencement->time()->modify('-1.5 hours'), true, true); ?> to provide time to park, check in, and be seated.
+    You should arrive between <?php echo Format::time($commencement->relativeTime('student_arrival_start'), true, true); ?>
+    and <?php echo Format::time($commencement->relativeTime('student_arrival_end'), true, true); ?> to provide time to park, check in, and be seated.
     More information about what you and your guests can expect the day of the ceremony and what you need to do to prepare is available online:
 </p>
 

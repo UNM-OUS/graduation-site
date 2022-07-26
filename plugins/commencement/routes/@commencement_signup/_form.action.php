@@ -44,7 +44,8 @@ if (!($window->open() || (!$window->ended() && $rsvp->exists()) || Permissions::
 // special degree-checking for student signups
 if (in_array($window->type(), Config::get('commencement.student_signup_types'))) {
     $eligible = DegreeSemesterConstraint::forCommencement($window->commencement()->semester())->degrees();
-    $eligible->where('netid = ?', [$for]);
+    if ($levels = $window->degreeLevels()) $eligible->where('level', $levels);
+    $eligible->where('netid', $for);
     if (!$eligible->count()) {
         // notes that may help user, error message and any degrees that were found
         Notifications::printError("No eligible degree records found for <code>$for</code>");
@@ -52,18 +53,19 @@ if (in_array($window->type(), Config::get('commencement.student_signup_types')))
         if (!$all->count()) {
             echo "<p>No degree records were found in our system.</p>";
         } else {
-            echo "<p>The following degree records were found, but are not currently eligible to sign up:</p>";
+            echo "<p>The following degree records were found for you, but they are not currently eligible to sign up using this signup form:</p>";
             echo new PaginatedTable(
                 $all,
                 function (Degree $degree) {
                     return [
                         $degree->status(),
+                        $degree->semester(),
                         $degree->college(),
                         $degree->department(),
                         $degree->program()
                     ];
                 },
-                ['Status', 'School/College', 'Department', 'Program']
+                ['Status', 'Semester', 'School/College', 'Department', 'Program']
             );
         }
         // general eligibility template

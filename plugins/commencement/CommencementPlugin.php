@@ -54,12 +54,8 @@ class CommencementPlugin extends AbstractPlugin
                 break;
         }
         if (!$event) return null;
-        $time = $event->time();
-        try {
-            if ($s->getParameter('offset')) $time->modify($s->getParameter('offset'));
-        } catch (\Throwable $th) {
-            return "{invalid time offset}";
-        }
+        if ($s->getParameter('offset')) $time = $event->relativeTime($s->getParameter('offset'));
+        else $time = $event->time();
         return Format::$format_method($time);
     }
 }

@@ -346,12 +346,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/digraph-cms/digraph-core.git",
-                "reference": "71c009a28bb5a34feb25ed3e758f8bde0c690a80"
+                "reference": "7340b98853580fd8cbe1c3cf1860d5b7ece8dd41"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/digraph-cms/digraph-core/zipball/71c009a28bb5a34feb25ed3e758f8bde0c690a80",
-                "reference": "71c009a28bb5a34feb25ed3e758f8bde0c690a80",
+                "url": "https://api.github.com/repos/digraph-cms/digraph-core/zipball/7340b98853580fd8cbe1c3cf1860d5b7ece8dd41",
+                "reference": "7340b98853580fd8cbe1c3cf1860d5b7ece8dd41",
                 "shasum": ""
             },
             "require": {
@@ -423,7 +423,7 @@
                 "issues": "https://github.com/digraph-cms/digraph-core/issues",
                 "source": "https://github.com/digraph-cms/digraph-core/tree/v2"
             },
-            "time": "2022-07-25T16:01:23+00:00"
+            "time": "2022-07-26T18:28:06+00:00"
         },
         {
             "name": "donatj/phpuseragentparser",
@@ -2521,16 +2521,16 @@
         },
         {
             "name": "scssphp/scssphp",
-            "version": "v1.10.3",
+            "version": "v1.10.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scssphp/scssphp.git",
-                "reference": "0f1e1516ed2412ad43e42a6a319e77624ba1f713"
+                "reference": "8ed20753db2d3d82629e6f5d35535bbbd3893b0c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/scssphp/scssphp/zipball/0f1e1516ed2412ad43e42a6a319e77624ba1f713",
-                "reference": "0f1e1516ed2412ad43e42a6a319e77624ba1f713",
+                "url": "https://api.github.com/repos/scssphp/scssphp/zipball/8ed20753db2d3d82629e6f5d35535bbbd3893b0c",
+                "reference": "8ed20753db2d3d82629e6f5d35535bbbd3893b0c",
                 "shasum": ""
             },
             "require": {
@@ -2557,6 +2557,12 @@
                 "bin/pscss"
             ],
             "type": "library",
+            "extra": {
+                "bamarni-bin": {
+                    "forward-command": false,
+                    "bin-links": false
+                }
+            },
             "autoload": {
                 "psr-4": {
                     "ScssPhp\\ScssPhp\\": "src/"
@@ -2589,9 +2595,9 @@
             ],
             "support": {
                 "issues": "https://github.com/scssphp/scssphp/issues",
-                "source": "https://github.com/scssphp/scssphp/tree/v1.10.3"
+                "source": "https://github.com/scssphp/scssphp/tree/v1.10.4"
             },
-            "time": "2022-05-16T07:22:18+00:00"
+            "time": "2022-07-26T16:28:33+00:00"
         },
         {
             "name": "spatie/image",
@@ -4150,12 +4156,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/UNM-OUS/ous_digraph_module.git",
-                "reference": "29a7428031c4f84f225f0a71934bdb7ec58cfc38"
+                "reference": "be6e3e76a01f2ac7974314530a1f12e301f0132f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/UNM-OUS/ous_digraph_module/zipball/29a7428031c4f84f225f0a71934bdb7ec58cfc38",
-                "reference": "29a7428031c4f84f225f0a71934bdb7ec58cfc38",
+                "url": "https://api.github.com/repos/UNM-OUS/ous_digraph_module/zipball/be6e3e76a01f2ac7974314530a1f12e301f0132f",
+                "reference": "be6e3e76a01f2ac7974314530a1f12e301f0132f",
                 "shasum": ""
             },
             "require": {
@@ -4174,7 +4180,7 @@
                 "source": "https://github.com/UNM-OUS/ous_digraph_module/tree/v2",
                 "issues": "https://github.com/UNM-OUS/ous_digraph_module/issues"
             },
-            "time": "2022-07-25T19:23:33+00:00"
+            "time": "2022-07-26T16:30:29+00:00"
         }
     ],
     "packages-dev": [],
@@ -4188,5 +4194,5 @@
     "platform-overrides": {
         "php": "7.4.15"
     },
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.3.0"
 }

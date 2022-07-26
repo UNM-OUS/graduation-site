@@ -9,11 +9,12 @@ use DigraphCMS_Plugins\unmous\ous_digraph_module\Semester;
 
 class DegreeField extends Field
 {
-    public function __construct(string $label, string $netid, Semester $semester)
+    public function __construct(string $label, string $netid, Semester $semester, $level = null)
     {
         $options = [];
         $eligible = DegreeSemesterConstraint::forCommencement($semester)->degrees();
-        $eligible->where('netid = ?', [$netid]);
+        $eligible->where('netid', $netid);
+        if ($level) $eligible->where('level', $level);
         while ($degree = $eligible->fetch()) {
             $options[$degree->id()] = implode(', ', array_filter(
                 [

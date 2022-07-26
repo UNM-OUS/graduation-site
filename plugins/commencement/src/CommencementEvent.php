@@ -3,8 +3,11 @@
 namespace DigraphCMS_Plugins\unmous\commencement;
 
 use DateTime;
+use DigraphCMS\Config;
 use DigraphCMS\Content\Page;
 use DigraphCMS\URL\URL;
+use DigraphCMS\Users\Permissions;
+use DigraphCMS\Users\User;
 use DigraphCMS_Plugins\unmous\commencement\SignupWindows\SignupWindows;
 use DigraphCMS_Plugins\unmous\commencement\SignupWindows\SignupWindowSelect;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\Semester;
@@ -12,7 +15,13 @@ use DigraphCMS_Plugins\unmous\ous_digraph_module\Semesters;
 
 class CommencementEvent extends Page
 {
-    const DEFAULT_SLUG = '/[semester]_[uuid]';
+    const DEFAULT_SLUG = '/[semester][typesuffix]';
+
+    public function permissions(URL $url, ?User $user = null): ?bool
+    {
+        if ($url->action() == '_program_preview') return Permissions::inGroup('users');
+        return parent::permissions($url, $user);
+    }
 
     public static function create(Semester $semester, DateTime $time, ?string $location, string $type): CommencementEvent
     {
@@ -59,6 +68,10 @@ class CommencementEvent extends Page
     public function slugVariable(string $name): ?string
     {
         switch ($name) {
+            case 'typesuffix':
+                return ($this->type() != 'combined')
+                    ? '_' . $this->type()
+                    : '';
             case 'semester':
                 return $this->semester()->__toString();
             default:
@@ -70,6 +83,14 @@ class CommencementEvent extends Page
     {
         return (new DateTime())
             ->setTimestamp($this['time']);
+    }
+
+    public function relativeTime(string $modifier): DateTime
+    {
+        return $this->time()->modify(
+            Config::get("commencement.relative_times.$modifier")
+                ?? $modifier
+        );
     }
 
     public function location(): string

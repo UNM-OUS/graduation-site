@@ -3,6 +3,15 @@ page_types:
   commencement_signup: \DigraphCMS_Plugins\unmous\commencement\SignupWindows\SignupWindow
 
 commencement:
+  relative_times:
+    doors_open: -90 minutes
+    estimated_end: +150 minutes
+    student_arrival_start: -90 minutes
+    student_arrival_end: -60 minutes
+    guest_arrival_start: -90 minutes
+    guest_arrival_end: -30 minutes
+    faculty_arrival_start: -90 minutes
+    faculty_arrival_end: -60 minutes
   rsvp_email_subjects:
     created: Commencement RSVP confirmation
     cancelled: Commencement RSVP cancelled
@@ -35,3 +44,14 @@ commencement:
     - type: faculty
       start: -95 days
       end: -15 days
+
+email:
+  enabled: true
+  from: null
+  categories:
+    commencement-hooder-request:
+      label: Commencement Hooder Requests
+      description: Requests from doctoral students who would like you to act as their hooder at Commencement.
+    commencement-rsvp:
+      label: Commencement RSVP Info
+      description: Automated emails about your RSVPs for Commencement.

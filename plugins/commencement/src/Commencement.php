@@ -8,8 +8,7 @@ use DigraphCMS_Plugins\unmous\ous_digraph_module\Semesters;
 
 class Commencement
 {
-
-    public function get(?string $uuid): ?CommencementEvent
+    public static function get(?string $uuid): ?CommencementEvent
     {
         if (!$uuid) return null;
         return static::select()
@@ -35,17 +34,19 @@ class Commencement
     public static function latest(string $type = null): CommencementSelect
     {
         $select = static::select()
-            ->where('${data.semester} <= ?', [Semesters::current()->intVal()])
+            ->where('${data.semester} <= ?', [Semesters::latest()->intVal()])
             ->order('${data.time} ASC');
         if ($type) $select->where('${data.type} = ?', [$type]);
         return $select;
     }
 
-    public static function current(): CommencementSelect
+    public static function current(string $type = null): CommencementSelect
     {
-        return static::select()
-            ->where('${data.semester} = ?', [Semesters::current()->intVal()])
+        $select = static::select()
+            ->where('${data.semester} <= ?', [Semesters::current()->intVal()])
             ->order('${data.time} ASC');
+        if ($type) $select->where('${data.type} = ?', [$type]);
+        return $select;
     }
 
     public static function past(): CommencementSelect

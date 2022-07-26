@@ -13,7 +13,7 @@ cron:
 
 # Should only be disabled for sites that require general signins, like for signups
 unm:
-  block_unknown_netids: null
+  block_unknown_netids: false
 usermenu:
   guest_signin: false
 

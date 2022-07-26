@@ -19,6 +19,19 @@ class SignupWindow extends AbstractPage
 {
     const DEFAULT_SLUG = '[uuid]';
 
+    public function degreeLevels(): ?array
+    {
+        switch ($this->type()) {
+            case 'terminal':
+                return ['terminal'];
+            case 'master':
+                return ['master'];
+            case 'undergrad':
+                return ['bachelor', 'associate'];
+        }
+        return null;
+    }
+
     public function rsvpReportHeaders(): array
     {
         $headers = [
@@ -31,6 +44,7 @@ class SignupWindow extends AbstractPage
         if ($this->type() == 'terminal') {
             $headers[] = 'Hooder name';
             $headers[] = 'Hooder email';
+            $headers[] = 'Assigned hooder';
         }
         // faculty columns
         if ($this->isForFaculty()) {
@@ -50,15 +64,16 @@ class SignupWindow extends AbstractPage
             $rsvp['accommodations.requested'] ? [
                 'Phone' => $rsvp['accommodations.phone'],
                 'Requested' => implode(', ', array_diff($rsvp['accommodations.needs'], ['other'])),
-                'Other accommodations' => $rsvp['accommodations.extra'] ? '<br>' . $rsvp['accommodations.extra'] : null
+                'Other accommodations' => $rsvp['accommodations.extra'] ? '<br>extra info supplied, see RSVP page' : null
             ] : ''
         ];
         // student degree
         if ($this->isForStudents()) $cells[] = implode(', ', [$rsvp['degree']['college'], $rsvp['degree']['program']]);
         // hooders
         if ($this->type() == 'terminal') {
-            $cells[] = $this['hooder.name'];
-            $cells[] = $this['hooder.email'];
+            $cells[] = $rsvp['hooder.name'];
+            $cells[] = $rsvp['hooder.email'];
+            $cells[] = $rsvp['hooder.assigned'] ? RSVPs::get($rsvp['hooder.assigned'])->url()->html() : '';
         }
         // faculty columns
         if ($this->isForFaculty()) {
@@ -89,6 +104,7 @@ class SignupWindow extends AbstractPage
             $headers[] = 'Dissertation';
             $headers[] = 'Hooder name';
             $headers[] = 'Hooder email';
+            $headers[] = 'Assigned hooder';
         }
         // faculty columns
         if ($this->isForFaculty()) {
@@ -119,6 +135,7 @@ class SignupWindow extends AbstractPage
             $cells[] = $rsvp['degree.dissertation'];
             $cells[] = $rsvp['hooder.name'];
             $cells[] = $rsvp['hooder.email'];
+            $cells[] = $rsvp['hooder.assigned'] ? new LinkCell(RSVPs::get($rsvp['hooder.assigned'])->name(), RSVPs::get($rsvp['hooder.assigned'])->url()) : '';
         }
         // faculty columns
         if ($this->isForFaculty()) {
@@ -149,7 +166,7 @@ class SignupWindow extends AbstractPage
             if ($url->action() == 'reader_list') return false;
             if ($url->action() == 'name_cards') return false;
         }
-        if (!$this->type() == 'terminal') {
+        if ($this->type() != 'terminal') {
             if ($url->action() == 'hooder_assignments') return false;
         }
         return parent::permissions($url, $user);

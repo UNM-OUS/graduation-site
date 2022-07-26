@@ -194,7 +194,7 @@ class RSVP extends FlatArray
         ));
         foreach ($recipients as $address) {
             Emails::send(new EmailMessage(
-                'service',
+                'commencement-rsvp',
                 Config::get('commencement.rsvp_email_subjects.' . $template) ?? 'Commencement RSVP notification',
                 $address,
                 null,
@@ -259,11 +259,16 @@ class RSVP extends FlatArray
             // add pronunciation for students only
             $pronunciation = null;
             if ($this->window()->isForStudents()) {
-                $name->addTip('This field is autopopulated automatically, but feel free to change it if you would like to have a different name read at the ceremony.');
+                $name
+                    ->addTip('This field is autopopulated automatically, but feel free to change it if you would like to have your name read differently at the ceremony.')
+                    ->addTip(sprintf(
+                        'To see the degree records currently listed for you, visit <a href="%s" target="_blank">How will my name appear in the program?</a>',
+                        $this->window()->commencement()->url('_program_preview.html')
+                    ));
                 $pronunciation = (new Field('Name pronunciation'))
                     ->addTip('Instructions for the readers to help them pronounce your name, if you are worried they may not do so correctly')
                     ->addTip('For example Ada Lovelace might enter "Aye-Duh Luv-Lace" or Lobo Lucy might enter "Low-Bow Loo-See"')
-                    ->setDefault($this['pronunciation'] ?? PersonInfo::getFor($this->for(),'pronunciation'))
+                    ->setDefault($this['pronunciation'] ?? PersonInfo::getFor($this->for(), 'pronunciation'))
                     ->setRequired(false)
                     ->addForm($this->form);
             }
@@ -336,7 +341,8 @@ class RSVP extends FlatArray
 
     protected function studentForm(FormWrapper $form)
     {
-        $degree = (new DegreeField('Degree to be recognized', $this->for, $this->window()->commencement()->semester()))
+        $level = $this->window()->degreeLevels();
+        $degree = (new DegreeField('Degree to be recognized', $this->for, $this->window()->commencement()->semester(), $level))
             ->setDefault($this['degree.id'])
             ->addTip('Due to time constraints students can only be recognized for a single degree, and only doctoral/terminal students will have their majors read.')
             ->addTip('Only your name is read for undergraduate and Master\'s degree students, and your selection here is only used to plan how much seating is necessary for your School/College.')
@@ -367,7 +373,7 @@ class RSVP extends FlatArray
                 // if hooder information has changed, email hooder
                 if ($hooder->value() != $this['hooder'] && $hooder->value()['email']) {
                     Emails::send(new EmailMessage(
-                        'system',
+                        'commencement-hooder-request',
                         'Commencement hooder request',
                         $hooder->value()['email'],
                         null,
