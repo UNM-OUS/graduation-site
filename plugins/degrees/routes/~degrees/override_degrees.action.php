@@ -81,6 +81,7 @@ if (isset($college) && $college->value()) {
             ->where('semester >= ? AND semester <= ?', [$semester->value()->intval() - 400, $semester->value()->intval() + 400])
             ->where('level = ?', [$level->value()])
             ->where('college = ?', [$college->value()])
+            ->where('department IS NOT NULL')
             ->group('department')->fetchAll()
     );
     $departments = array_combine($departments, $departments);
