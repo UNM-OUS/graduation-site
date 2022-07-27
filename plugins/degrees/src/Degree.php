@@ -5,6 +5,7 @@ namespace DigraphCMS_Plugins\unmous\degrees;
 use DigraphCMS\Config;
 use DigraphCMS\DB\DB;
 use DigraphCMS_Plugins\unmous\ous_digraph_module\Semester;
+use DigraphCMS_Plugins\unmous\ous_digraph_module\StringFixer;
 
 class Degree
 {
@@ -25,7 +26,7 @@ class Degree
             }
         }
         // userid
-        $userID = md5($row['id'] . Config::get('secret'));
+        $userID = md5($row['id'] . Config::secret());
         // first name is either preferred or regular
         $firstName = trim($row['student preferred first name']);
         if (!$firstName) $firstName = $row['student first name'];
@@ -88,13 +89,13 @@ class Degree
             $row['graduation status'],
             Semester::fromCode($row['academic period code']),
             $row['award category'],
-            static::fixCollegeName($row['college']),
-            $row['department'],
-            $row['program'],
-            $row['major'],
-            $row['second major'],
-            $row['first minor'],
-            $row['second minor'],
+            StringFixer::college($row['college']),
+            StringFixer::department($row['department']),
+            StringFixer::program($row['program']),
+            StringFixer::major($row['major']),
+            StringFixer::major($row['second major']),
+            StringFixer::major($row['first minor']),
+            StringFixer::major($row['second minor']),
             $honors ? ucwords(strtolower($honors)) : null,
             $job,
             static::fixDissertationTitle($row['dissertation title']),
@@ -275,20 +276,6 @@ class Degree
     public function job(): ?string
     {
         return $this->job;
-    }
-
-    public static function fixCollegeName(?string $name): ?string
-    {
-        $name = trim($name);
-        if (!$name) return null;
-        return $name;
-    }
-
-    public static function fixDepartmentName(?string $name): ?string
-    {
-        $name = trim($name);
-        if (!$name) return null;
-        return $name;
     }
 
     public static function fixDissertationTitle(?string $title): ?string
