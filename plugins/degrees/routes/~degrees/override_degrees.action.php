@@ -59,7 +59,10 @@ if ($netid->value() && $firstName->value() && $lastName->value()) {
             return $row['college'];
         },
         DB::query()->from('degree')
-            ->where('level = ?', [$level->value()])
+            // limit to 2 years before or after given semester, to not show defunct stuff
+            ->where('semester >= ? AND semester <= ?', [$semester->value()->intval() - 200, $semester->value()->intval() + 200])
+            // limit to given level
+            ->where('level', $level->value())
             ->group('college')->fetchAll()
     );
     $colleges = array_combine($colleges, $colleges);
@@ -74,6 +77,8 @@ if (isset($college) && $college->value()) {
             return $row['department'];
         },
         DB::query()->from('degree')
+            // limit to 4 years before or after given semester, to not show defunct stuff
+            ->where('semester >= ? AND semester <= ?', [$semester->value()->intval() - 400, $semester->value()->intval() + 400])
             ->where('level = ?', [$level->value()])
             ->where('college = ?', [$college->value()])
             ->group('department')->fetchAll()
@@ -90,6 +95,8 @@ if (isset($department) && $department->value()) {
             return $row['program'];
         },
         DB::query()->from('degree')
+            // limit to 4 years before or after given semester, to not show defunct stuff
+            ->where('semester >= ? AND semester <= ?', [$semester->value()->intval() - 400, $semester->value()->intval() + 400])
             ->where('level = ?', [$level->value()])
             ->where('college = ?', [$college->value()])
             ->where('department = ?', [$department->value()])
@@ -174,7 +181,7 @@ $table = new PaginatedTable(
                 'program' => $degree->program(),
                 'major' => $degree->major1()
             ],
-            (new CallbackLink(function()use($degree){
+            (new CallbackLink(function () use ($degree) {
                 $degree->delete();
             }))
                 ->addChild('delete')
