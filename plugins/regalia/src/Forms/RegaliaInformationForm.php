@@ -57,7 +57,7 @@ class RegaliaInformationForm extends DIV
             $div->addChild(sprintf(
                 '<div><strong>Degree: </strong> %s%s</div>',
                 $preset['label'],
-                !$preset['preset'] ? ' (' . $field['label'] . ')' : ''
+                !@$preset['preset'] ? ' (' . $field['label'] . ')' : ''
             ));
             $div->addChild(sprintf(
                 '<div><strong>Alma mater: </strong> %s</div>',
